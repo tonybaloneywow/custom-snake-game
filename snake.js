@@ -1,10 +1,18 @@
-
 //board
 var blockSize = 25;
+var appleSize = 20.83;
 var rows = 20;
 var cols = 20;
 var board;
 var context;
+
+const appleImage = new Image();
+appleImage.src = './Apples/apple.png';
+
+// context.onload = function(){
+//     context.drawImage(appleImage, 50, 20, 150, 40)
+// }
+
 
 //snake head
 var snakeX = blockSize * 5;
@@ -21,16 +29,27 @@ var foodY;
 
 var gameOver = false;
 
+appleImage.onload = function() {
+    appleLoaded = true;
+}
+
 window.onload = function() {
     board = document.getElementById("board");
     board.height = rows * blockSize;
     board.width = cols * blockSize;
     context = board.getContext("2d"); //used for drawing on the board
 
+    context.imageSmoothingEnabled = false;
+    context.mozImageSmoothingEnabled = false;
+    context.webkitImageSmoothingEnabled = false;
+    context.msImageSmoothingEnabled = false;
+
     placeFood();
     document.addEventListener("keyup", changeDirection);
     // update();
     setInterval(update, 1000/10); //100 milliseconds
+
+
 }
 
 function update() {
@@ -42,7 +61,10 @@ function update() {
     context.fillRect(0, 0, board.width, board.height);
 
     context.fillStyle="red"
-    context.fillRect(foodX, foodY, blockSize, blockSize)
+    // context.fillRect(foodX, foodY, blockSize, blockSize);
+    context.imageSmoothingEnabled = false;
+    context.drawImage(appleImage, foodX, foodY, appleSize, blockSize)
+   
 
     if (snakeX ==  foodX && snakeY == foodY) {
         snakeBody.push([foodX, foodY])
@@ -98,9 +120,16 @@ function changeDirection(e) {
     }
 }
 
+// function drawApple( x, y){
+//     console.log(x);
+//     console.log(y);
+//     context.drawImage(appleImage, foodX, foodY, blockSize, blockSize)
+// }
 
 function placeFood() {
     //0-1) *cols -> (0-19.99999) -> (0-19) * 25
     foodX = Math.floor(Math.random() * cols) * blockSize;
     foodY = Math.floor(Math.random() * rows) * blockSize;
+    // drawApple(foodX, foodY);
+ 
 }
