@@ -5,12 +5,20 @@ body {
     justify-content: center;
     height: 100vh;
     overflow: hidden;
-  }
+    cursor: url('/Cursors/cursor.png') 0 0, auto;
+}
 
 #menuBackground {
     align-self: center;
     position: absolute;
     z-index: 5;
+    -drag: none;
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-drag: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+    pointer-events: none;
 }
 
 #menuTitleSnake {
@@ -19,6 +27,13 @@ body {
     z-index: 100;
     width: 1264px;
     height: 312px;
+    pointer-events: none;
+    -drag: none;
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-drag: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
     
     /* Initial positioning */
     transform: translateY(-131px);
@@ -37,9 +52,26 @@ body {
 }
 
 #menuPlayButton {
+    /* Basic button styling */
+    display: inline-block;
     align-self: center;
-    position: absolute;
     z-index: 100;
-    width: 506.25px;
-    height: 123.75px;
+    margin-top: 410px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    transition: all 0.2s ease-in-out;
+    transform-origin: center;
+    transform: scale(1);
+    cursor: url('/Cursors/glove.png') 0 0, pointer !important; /* Force override */
+}
+
+#menuPlayButton:hover {
+    transform: scale(1.05);
+    cursor: url('/Cursors/glove.png') 0 0, pointer !important;
+}
+
+#menuPlayButton:active {
+    transform: scale(0.9);
+    cursor: url('/Cursors/glove.png') 0 0, pointer !important;
 }
