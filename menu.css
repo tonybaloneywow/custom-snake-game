@@ -1,0 +1,45 @@
+body {
+    background-color: black;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+#menuBackground {
+    align-self: center;
+    position: absolute;
+    z-index: 5;
+}
+
+#menuTitleSnake {
+    align-self: center;
+    position: absolute;
+    z-index: 100;
+    width: 1264px;
+    height: 312px;
+    
+    /* Initial positioning */
+    transform: translateY(-131px);
+    
+    /* Animation that preserves the Y-position */
+    animation: pulse 1.75s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        transform: translateY(-131px) scale(1); 
+    }
+    50% { 
+        transform: translateY(-131px) scale(1.06); 
+    }
+}
+
+#menuPlayButton {
+    align-self: center;
+    position: absolute;
+    z-index: 100;
+    width: 506.25px;
+    height: 123.75px;
+}
