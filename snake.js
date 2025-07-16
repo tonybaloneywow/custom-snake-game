@@ -1,8 +1,8 @@
 //board
-var blockSize = 25;
-var appleSize = 20.83;
-var rows = 20;
-var cols = 20;
+var blockSize = 50;
+var appleSize = 41.66;
+var rows = 15;
+var cols = 28;
 var board;
 var context;
 
@@ -47,58 +47,68 @@ window.onload = function() {
     placeFood();
     document.addEventListener("keyup", changeDirection);
     // update();
-    setInterval(update, 1000/10); //100 milliseconds
+    setInterval(update, 1000/8.5); //100 milliseconds
 
 
 }
 
 function update() {
-    if(gameOver) {
-        return;
-    }
+    if (gameOver) return;
 
-    context.fillStyle="black";
+    // Clear canvas
+    context.fillStyle = "#A2D149";
     context.fillRect(0, 0, board.width, board.height);
 
-    context.fillStyle="red"
-    // context.fillRect(foodX, foodY, blockSize, blockSize);
+    // Draw apple (with anti-aliasing disabled)
     context.imageSmoothingEnabled = false;
-    context.drawImage(appleImage, foodX, foodY, appleSize, blockSize)
-   
+    context.drawImage(appleImage, foodX, foodY, appleSize, blockSize);
 
-    if (snakeX ==  foodX && snakeY == foodY) {
-        snakeBody.push([foodX, foodY])
+    // Check if snake ate food
+    if (snakeX === foodX && snakeY === foodY) {
+        snakeBody.push([foodX, foodY]);
         placeFood();
     }
 
-    for(let i = snakeBody.length-1; i > 0; i--) {
-        snakeBody[i] = snakeBody[i-1];
+    // Update snake body positions
+    for (let i = snakeBody.length - 1; i > 0; i--) {
+        snakeBody[i] = snakeBody[i - 1];
     }
     if (snakeBody.length) {
-        snakeBody[0] = [snakeX, snakeY]
+        snakeBody[0] = [snakeX, snakeY];
     }
 
-
-    context.fillStyle="lime";
+    // Move snake head
     snakeX += velocityX * blockSize;
     snakeY += velocityY * blockSize;
+
+    // Border collision detection (all four walls)
+    if (snakeX < 0 || snakeX >= cols * blockSize || 
+        snakeY < 0 || snakeY >= rows * blockSize) {
+        endGame("Game Over - Hit the wall!");
+        return;
+    }
+
+    // Draw snake head and body
+    context.fillStyle = "#4C7AF2";
     context.fillRect(snakeX, snakeY, blockSize, blockSize);
     for (let i = 0; i < snakeBody.length; i++) {
         context.fillRect(snakeBody[i][0], snakeBody[i][1], blockSize, blockSize);
     }
 
-    //game over conditions
-    if (snakeX < 0 || snakeX > cols*blockSize || snakeY > rows*blockSize) {
-        gameOver = true;
-        alert("Game Over");
-    }
-
+    // Self-collision detection
     for (let i = 0; i < snakeBody.length; i++) {
-        if (snakeX == snakeBody[i][0] && snakeY == snakeBody[i][1]) {
-            gameOver = true;
-            alert("Game Over");
+        if (snakeX === snakeBody[i][0] && snakeY === snakeBody[i][1]) {
+            endGame("Game Over - Ate yourself!");
+            break;
         }
     }
+}
+
+// Add this helper function outside update():
+function endGame(message) {
+    gameOver = true;
+    alert(message);
+    // Optional: Add restart button logic here later
 }
 
 function changeDirection(e) {
