@@ -16,12 +16,6 @@ body {
     height: 100%;
     object-fit: cover;
     z-index: 5;
-    user-select: none;
-    -moz-user-select: none;
-    -webkit-user-drag: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    pointer-events: none;
 }
 
 #menuTitleSnake {
@@ -31,12 +25,6 @@ body {
     height: 312px;
     left: 50%;
     transform: translateX(-50%) translateY(-131px);
-    pointer-events: none;
-    user-select: none;
-    -moz-user-select: none;
-    -webkit-user-drag: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
     animation: pulse 1.75s infinite;
 }
 
@@ -77,4 +65,13 @@ a[href="/index.html"] {
 
 #menuPlayButton:active {
     transform: scale(0.8);
+}
+
+img, a{  
+    -webkit-user-select: none; /* Safari 3.1+ */ 
+    -moz-user-select: none; /* Firefox 2+ */ 
+    -ms-user-select: none; /* IE 10+ */ 
+    user-select: none; /* Standard syntax */ 
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
 }
