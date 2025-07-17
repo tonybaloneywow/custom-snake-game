@@ -5,13 +5,17 @@ const rows = 15;
 const cols = 28;
 let board, context;
 
+
 // Game objects
 const appleImage = new Image();
 appleImage.src = './Apples/normal.png';
+
 let snakeX = blockSize * 5;
 let snakeY = blockSize * 5;
-let velocityX = 0; // Start stationary
+
+let velocityX = 0;
 let velocityY = 0;
+
 let snakeBody = [];
 let foodX, foodY;
 let gameOver = false;
@@ -37,6 +41,12 @@ window.onload = function() {
     placeFood();
     document.addEventListener("keydown", changeDirection);
     setInterval(update, 1000/10); // Increased to 10 FPS for smoother movement
+
+    // Force hide cursor on canvas
+    board.style.cursor = 'none';
+    
+    // Ensure game over popup can be clicked
+    document.getElementById('gameOverPopup').style.pointerEvents = 'auto';
 };
 
 function update() {
@@ -51,8 +61,16 @@ function update() {
     context.fillStyle = "#A2D149";
     context.fillRect(0, 0, board.width, board.height);
 
-    // Draw apple
-    context.drawImage(appleImage, foodX, foodY, appleSize, blockSize);
+    const appleWidth = 41.66;
+    const appleHeight = 50;
+    
+    context.drawImage(
+        appleImage,
+        foodX + (blockSize - appleWidth)/2,
+        foodY + (blockSize - appleHeight)/2,
+        appleWidth,
+        appleHeight
+    );
 
     // Check food collision
     if (snakeX === foodX && snakeY === foodY) {
@@ -158,6 +176,8 @@ function checkSelfCollision() {
 function endGame() {
     gameOver = true;
     
+    document.body.style.cursor = 'default';
+
     // Show your image popup
     const popup = document.getElementById("gameOverPopup");
     const gameOverImg = document.getElementById("gameOverImage");
@@ -176,6 +196,32 @@ function endGame() {
 
 
 function placeFood() {
-    foodX = Math.floor(Math.random() * cols) * blockSize;
-    foodY = Math.floor(Math.random() * rows) * blockSize;
+    let validPosition = false;
+    let newFoodX, newFoodY;
+    
+    // Keep trying random positions until we find a valid one
+    while (!validPosition) {
+        newFoodX = Math.floor(Math.random() * cols) * blockSize;
+        newFoodY = Math.floor(Math.random() * rows) * blockSize;
+        
+        // Check if this position collides with snake head
+        const headCollision = (newFoodX === snakeX && newFoodY === snakeY);
+        
+        // Check if this position collides with any snake body segment
+        let bodyCollision = false;
+        for (let i = 0; i < snakeBody.length; i++) {
+            if (newFoodX === snakeBody[i][0] && newFoodY === snakeBody[i][1]) {
+                bodyCollision = true;
+                break;
+            }
+        }
+        
+        // If no collisions, we found a valid position
+        if (!headCollision && !bodyCollision) {
+            validPosition = true;
+        }
+    }
+    
+    foodX = newFoodX;
+    foodY = newFoodY;
 }

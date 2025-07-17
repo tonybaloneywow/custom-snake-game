@@ -3,75 +3,78 @@ body {
     margin: 0;
     display: flex;
     justify-content: center;
+    align-items: center;
     height: 100vh;
     overflow: hidden;
     cursor: url('/Cursors/cursor.png') 0 0, auto;
+    position: relative;
 }
 
 #menuBackground {
-    align-self: center;
     position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     z-index: 5;
-    -drag: none;
-            user-select: none;
-            -moz-user-select: none;
-            -webkit-user-drag: none;
-            -webkit-user-select: none;
-            -ms-user-select: none;
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
     pointer-events: none;
 }
 
 #menuTitleSnake {
-    align-self: center;
     position: absolute;
     z-index: 100;
     width: 1264px;
     height: 312px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-131px);
     pointer-events: none;
-    -drag: none;
-            user-select: none;
-            -moz-user-select: none;
-            -webkit-user-drag: none;
-            -webkit-user-select: none;
-            -ms-user-select: none;
-    
-    /* Initial positioning */
-    transform: translateY(-131px);
-    
-    /* Animation that preserves the Y-position */
+    user-select: none;
+    -moz-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
     animation: pulse 1.75s infinite;
 }
 
 @keyframes pulse {
     0%, 100% { 
-        transform: translateY(-131px) scale(1); 
+        transform: translateX(-50%) translateY(-131px) scale(1); 
     }
     50% { 
-        transform: translateY(-131px) scale(1.06); 
+        transform: translateX(-50%) translateY(-131px) scale(1.06); 
     }
+}
+
+/* Play Button Container */
+a[href="/index.html"] {
+    position: absolute;
+    display: block;
+    z-index: 101;
+    top: 64%;
+    left: 50%;
+    transform: translateX(-50%);
+    cursor: url('/Cursors/glove.png') 0 0, pointer !important;
 }
 
 #menuPlayButton {
-    /* Basic button styling */
-    display: inline-block;
-    align-self: center;
-    z-index: 100;
-    margin-top: 410px;
-    background: transparent;
-    border: none;
-    padding: 0;
+    display: block;
+    width: auto; /* Maintain aspect ratio */
+    height: auto;
+    max-width: 100%;
     transition: all 0.2s ease-in-out;
     transform-origin: center;
-    transform: scale(1);
-    cursor: url('/Cursors/glove.png') 0 0, pointer !important; /* Force override */
+    pointer-events: auto !important;
+    cursor: url('/Cursors/glove.png') 0 0, pointer !important;
 }
 
 #menuPlayButton:hover {
-    transform: scale(1.05);
-    cursor: url('/Cursors/glove.png') 0 0, pointer !important;
+    transform: scale(1.1);
 }
 
 #menuPlayButton:active {
-    transform: scale(0.9);
-    cursor: url('/Cursors/glove.png') 0 0, pointer !important;
+    transform: scale(0.8);
 }
