@@ -10,6 +10,10 @@ let board, context;
 const appleImage = new Image();
 appleImage.src = './Apples/normal.png';
 
+// Snake Head
+const snakeHeadImg = new Image();
+snakeHeadImg.src = './Snake/Head.png';
+
 let snakeX = blockSize * 5;
 let snakeY = blockSize * 5;
 
@@ -24,6 +28,8 @@ let gameOver = false;
 let currentDirection = null;
 let nextDirection = null;
 const turnDelay = 0; // No cooldown for instant turns
+
+
 
 // Initialize game
 window.onload = function() {
@@ -72,10 +78,21 @@ function update() {
         appleHeight
     );
 
+    if (!(snakeX === foodX && snakeY === foodY)) {
+        const appleOffset = (blockSize - appleSize) / 2;
+        context.drawImage(
+            appleImage,
+            foodX + appleOffset,
+            foodY + appleOffset,
+            appleSize,
+            appleSize
+        );
+    }
+
     // Check food collision
     if (snakeX === foodX && snakeY === foodY) {
         snakeBody.push([foodX, foodY]);
-        placeFood();
+        placeFood(); // Get new apple position immediately
     }
 
     // Update snake body
@@ -98,10 +115,12 @@ function update() {
 
     // Draw snake
     context.fillStyle = "#4C7AF2";
-    context.fillRect(snakeX, snakeY, blockSize, blockSize);
     for (let i = 0; i < snakeBody.length; i++) {
         context.fillRect(snakeBody[i][0], snakeBody[i][1], blockSize, blockSize);
     }
+    
+    // Draw rotated head
+    drawSnakeHead(snakeX, snakeY);
 }
 
 function applyDirectionChange() {
@@ -224,4 +243,31 @@ function placeFood() {
     
     foodX = newFoodX;
     foodY = newFoodY;
+}
+
+// Function causes snake turn movement
+function drawSnakeHead(x, y) {
+    if (!snakeHeadImg.complete) {
+        // Fallback if image not loaded
+        context.fillRect(x, y, blockSize, blockSize);
+        return;
+    }
+
+    context.save(); // Save current canvas state
+    context.translate(x + blockSize/2, y + blockSize/2); // Move to center of head
+
+    // Calculate rotation angle based on velocity
+    let angle = 0;
+    if (velocityX === 1) angle = Math.PI/2;         // Right
+    if (velocityX === -1) angle = -Math.PI/2;   // Left
+    if (velocityY === -1) angle = 0; // Up
+    if (velocityY === 1) angle = Math.PI;   // Down
+
+    context.rotate(angle); // Apply rotation
+    context.drawImage(
+        snakeHeadImg,
+        -blockSize/2, -blockSize/2, // Draw from center
+        blockSize, blockSize
+    );
+    context.restore(); // Restore canvas state
 }
