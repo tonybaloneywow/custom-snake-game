@@ -14,6 +14,10 @@ appleImage.src = './Apples/normal.png';
 const snakeHeadImg = new Image();
 snakeHeadImg.src = './Snake/Head.png';
 
+// Background Image (Canvas)
+const backgroundImage = new Image();
+backgroundImage.src = './BGS/Lava.png';
+
 let snakeX = blockSize * 5;
 let snakeY = blockSize * 5;
 
@@ -63,9 +67,8 @@ function update() {
         applyDirectionChange();
     }
 
-    // Clear canvas
-    context.fillStyle = "#A2D149";
-    context.fillRect(0, 0, board.width, board.height);
+    context.drawImage(backgroundImage, 0, 0, board.width, board.height);
+
 
     const appleWidth = 41.66;
     const appleHeight = 50;
@@ -258,10 +261,10 @@ function drawSnakeHead(x, y) {
 
     // Calculate rotation angle based on velocity
     let angle = 0;
-    if (velocityX === 1) angle = Math.PI/2;         // Right
-    if (velocityX === -1) angle = -Math.PI/2;   // Left
-    if (velocityY === -1) angle = 0; // Up
-    if (velocityY === 1) angle = Math.PI;   // Down
+    if (velocityX === 1) angle = 0;         // Right
+    if (velocityX === -1) angle = Math.PI;   // Left
+    if (velocityY === -1) angle = -Math.PI/2; // Up
+    if (velocityY === 1) angle = Math.PI/2;   // Down
 
     context.rotate(angle); // Apply rotation
     context.drawImage(
