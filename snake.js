@@ -50,7 +50,7 @@ window.onload = function() {
     
     placeFood();
     document.addEventListener("keydown", changeDirection);
-    setInterval(update, 1000/10); // Increased to 10 FPS for smoother movement
+    setInterval(update, 1000/12); // Increased to 10 FPS for smoother movement
 
     // Force hide cursor on canvas
     board.style.cursor = 'none';
@@ -273,4 +273,16 @@ function drawSnakeHead(x, y) {
         blockSize, blockSize
     );
     context.restore(); // Restore canvas state
+} 
+
+// Add to your game variables
+const eatSound = document.getElementById('eatSound');
+eatSound.volume = 1.0; // Adjust volume (0.0 to 1.0)
+
+// Modify your apple collision code
+function checkAppleCollision() {
+    if (snakeX === foodX && snakeY === foodY) {
+        // Play eating sound
+        eatSound.currentTime = 0;
+    }
 }

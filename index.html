@@ -10,7 +10,7 @@
 
     <body>
     <canvas id="board" oncontextmenu="return false"></canvas>
-    <div id="gameOverPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100; text-align: center;">
+    <div id="gameOverPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; text-align: center;">
         <a href="./menu.html" draggable="false">
             <img id="gameOverImage" src="game-over.png" 
                 style="position: absolute; 
@@ -25,5 +25,6 @@
                         oncontextmenu="return false">
         </a>
     </div>
+    <audio id="eatSound" src="/Sounds/AppleEatNoise.wav" preload="auto"></audio>
     </body>
 </html>                     
