@@ -31,3 +31,50 @@ img, a{
 #gameOverPopup {
   position: absolute;
 }
+
+#replayButton {
+  width: 452px;
+  height: 92px;
+  
+  position: absolute;
+  
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 101;
+  
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+#replayButton:hover {
+  transform: translateX(-50%) scale(1.05);
+  filter: brightness(1.1);
+}
+
+#replayButton:active {
+  transform: translateX(-50%) scale(0.98);
+}
+
+#menuButton {
+  width: 452px;
+  height: 92px;
+  top: 70%;
+  left: 23.35%;
+  position: absolute;
+  
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 101;
+  
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+#replayButton:hover {
+  transform: translateX(-50%) scale(1.05);
+  filter: brightness(1.1);
+}
+
+#replayButton:active {
+  transform: translateX(-50%) scale(0.98);
+}

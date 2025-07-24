@@ -5,6 +5,8 @@ const rows = 15;
 const cols = 28;
 let board, context;
 
+// Replay Button
+let replayButton;
 
 // Game objects
 const appleImage = new Image();
@@ -57,6 +59,10 @@ window.onload = function() {
     
     // Ensure game over popup can be clicked
     document.getElementById('gameOverPopup').style.pointerEvents = 'auto';
+
+    // Set up replay button
+    replayButton = document.getElementById("replayButton");
+    replayButton.addEventListener("click", resetGame);
 };
 
 function update() {
@@ -209,13 +215,23 @@ function endGame() {
     
     // Center the popup on screen
     popup.style.display = "block";
-    
-    // Optional: Click anywhere to close
-    popup.onclick = function() {
-        popup.style.display = "none";
-    };
 }
 
+function resetGame() {
+    document.getElementById("gameOverPopup").style.display = "none";
+    snakeX = blockSize * 5;
+    snakeY = blockSize * 5;
+    velocityX = 0;
+    velocityY = 0;
+    snakeBody = [];
+    gameOver = false;
+    currentDirection = null;
+    nextDirection = null;
+    placeFood();
+    document.body.style.cursor = 'none';
+    board.style.cursor = 'none';
+    update();
+}
 
 function placeFood() {
     let validPosition = false;

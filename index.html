@@ -11,7 +11,7 @@
     <body>
     <canvas id="board" oncontextmenu="return false"></canvas>
     <div id="gameOverPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; text-align: center;">
-        <a href="./menu.html" draggable="false">
+        <a draggable="false">
             <img id="gameOverImage" src="game-over.png" 
                 style="position: absolute; 
                  top: 50%; 
@@ -24,7 +24,17 @@
                         object-fit: contain;"
                         oncontextmenu="return false">
         </a>
+        <img id="replayButton" src="/Pop-Ups/Replay.png" 
+         style="position: absolute; 
+                top: 70%; 
+                left: 65%; 
+                transform: translateX(-50%);
+                cursor: pointer;
+                z-index: 101;"
+         oncontextmenu="return false">
+         <a href="menu.html">
+            <img id="menuButton" src="/Pop-Ups/Menu.png" oncontextmenu="return false">
+         </a>
     </div>
-    <audio id="eatSound" src="/Sounds/AppleEatNoise.wav" preload="auto"></audio>
     </body>
-</html>                     
+</html>

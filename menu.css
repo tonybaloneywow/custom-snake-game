@@ -157,3 +157,63 @@ body {
 .exit-button:active {
     transform: scale(0.9);
 }
+
+.normal-button {
+  position: absolute;
+  cursor: pointer;
+  width: 210.58px;
+  height: 70.19px;
+  transition: transform 0.2s;
+  top: 49%;
+  left: 44%;
+  cursor: url('/Cursors/glove.png') 0 0, pointer;
+  z-index: 225;
+}
+
+.normal-button:hover {
+  transform: scale(1.1);
+}
+
+.normal-button:active {
+  transform: scale(0.9);
+}
+
+.easy-button {
+  position: absolute;
+  cursor: pointer;
+  width: 210.58px;
+  height: 70.19px;
+  transition: transform 0.2s;
+  top: 38.3125%;
+  left: 44%;
+  cursor: url('/Cursors/glove.png') 0 0, pointer;
+  z-index: 225;
+}
+
+.easy-button:hover {
+  transform: scale(1.1);
+}
+
+.easy-button:active {
+  transform: scale(0.9);
+}
+
+.hard-button {
+  position: absolute;
+  cursor: pointer;
+  width: 210.58px;
+  height: 70.19px;
+  transition: transform 0.2s;
+  top: 59.6875%;
+  left: 44%;
+  cursor: url('/Cursors/glove.png') 0 0, pointer;
+  z-index: 225;
+}
+
+.hard-button:hover {
+  transform: scale(1.1);
+}
+
+.hard-button:active {
+  transform: scale(0.9);
+}
