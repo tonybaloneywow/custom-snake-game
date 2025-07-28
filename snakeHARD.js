@@ -17,8 +17,15 @@ const snakeHeadImg = new Image();
 snakeHeadImg.src = './Snake/Head.png';
 
 // Background Image (Canvas)
+const mapImages = [
+    './BGS/Lava.png',
+    './BGS/Crossroads.png',
+    './BGS/Space.png',
+    './BGS/Ice.png',
+    './BGS/Summer.png'
+];
+let currentMap = '';
 const backgroundImage = new Image();
-backgroundImage.src = './BGS/Lava.png';
 
 let snakeX = blockSize * 5;
 let snakeY = blockSize * 5;
@@ -52,7 +59,7 @@ window.onload = function() {
     
     placeFood();
     document.addEventListener("keydown", changeDirection);
-    setInterval(update, 1000/14.5); // Increased to 10 FPS for smoother movement
+    setInterval(update, 1000/15); // Increased to 10 FPS for smoother movement
 
     // Force hide cursor on canvas
     board.style.cursor = 'none';
@@ -63,6 +70,9 @@ window.onload = function() {
     // Set up replay button
     replayButton = document.getElementById("replayButton");
     replayButton.addEventListener("click", resetGame);
+
+    resetGame();
+
 };
 
 function update() {
@@ -219,6 +229,8 @@ function endGame() {
 
 function resetGame() {
     document.getElementById("gameOverPopup").style.display = "none";
+    
+    // Reset game state
     snakeX = blockSize * 5;
     snakeY = blockSize * 5;
     velocityX = 0;
@@ -227,10 +239,22 @@ function resetGame() {
     gameOver = false;
     currentDirection = null;
     nextDirection = null;
+    
+    // Load random map
+    loadRandomMap();
+    
+    // Place new food
     placeFood();
+    
+    // Hide cursor again
     document.body.style.cursor = 'none';
     board.style.cursor = 'none';
-    update();
+    
+    // Redraw the initial state
+    // Note: We need to wait for the new background image to load
+    backgroundImage.onload = function() {
+        update();
+    };
 }
 
 function placeFood() {
@@ -301,4 +325,11 @@ function checkAppleCollision() {
         // Play eating sound
         eatSound.currentTime = 0;
     }
+}
+
+function loadRandomMap() {
+    // Randomly select a map
+    const randomIndex = Math.floor(Math.random() * mapImages.length);
+    currentMap = mapImages[randomIndex];
+    backgroundImage.src = currentMap;
 }
