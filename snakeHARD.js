@@ -59,7 +59,7 @@ window.onload = function() {
     
     placeFood();
     document.addEventListener("keydown", changeDirection);
-    setInterval(update, 1000/15); // Increased to 10 FPS for smoother movement
+    setInterval(update, 1000/12); // Increased to 10 FPS for smoother movement
 
     // Force hide cursor on canvas
     board.style.cursor = 'none';
