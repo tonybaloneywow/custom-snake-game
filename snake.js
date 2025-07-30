@@ -18,10 +18,6 @@ let velocityX = 0, velocityY = 0;
 let snakeBody = [], foodX, foodY;
 let currentDirection = null, nextDirection = null;
 
-// Game objects
-const appleImage = new Image();
-appleImage.src = './Apples/normal.png';
-
 const appleTypes = [
     {
         name: "normal",
@@ -31,26 +27,49 @@ const appleTypes = [
         weight: 0.5
     },
     {
-        name: "rotten",
+        name: "sour",
         image: "./Apples/sour.png",
-        effect: () => {
-
-        },
+        effect: () => {}, // Does nothing
         points: 0,
-        weight: 0.3
+        weight: 0.1
     },
     {
         name: "lightning",
         image: "./Apples/lightning.png",
         effect: () => {
-        speedMultiplier = 1.5; // 1.5x speed
-        speedBoostEndTime = Date.now() + 5000; // 5 seconds duration
-        clearInterval(gameInterval);
-        gameInterval = setInterval(update, baseSpeed / speedMultiplier);
+            speedMultiplier = 1.5;
+            speedBoostEndTime = Date.now() + 5000;
+            clearInterval(gameInterval);
+            gameInterval = setInterval(update, baseSpeed / speedMultiplier);
         },
         points: 1,
         weight: 0.2
+    },
+    {
+        name: "frozen",
+        image: "./Apples/frozen.png",
+        effect: () => {
+            speedMultiplier = 0.65; // 0.65x speed
+            speedBoostEndTime = Date.now() + 7000; // 10 seconds duration
+            clearInterval(gameInterval);
+            gameInterval = setInterval(update, baseSpeed / speedMultiplier);
+        },
+        points: 1,
+        weight: 0.2
+    },
+    {
+        name: "rotten",
+        image: "./Apples/rotten.png",
+        effect: () => {
+            invertedControls = true;
+            setTimeout(() => {
+                invertedControls = false;
+            }, 3000);
+        },
+        points: 1,
+        weight: 0
     }
+    
 ];
 
 let currentApple = appleTypes[0];
@@ -108,26 +127,33 @@ function update() {
 
     // Draw apple
     const appleImg = new Image();
-    appleImg.src = currentApple.image;
-    const appleOffsetX = Math.round((blockSize - appleSize)/2);
-    const appleOffsetY = Math.round((blockSize - 50)/2);
+appleImg.src = currentApple.image;
+const appleOffsetX = Math.round((blockSize - appleSize)/2);
+const appleOffsetY = Math.round((blockSize - 50)/2);
+
+// Special case for lightning apple
+if (currentApple.name === "lightning") {
+    // Draw at full block size
+    context.drawImage(appleImg, foodX, foodY, blockSize, blockSize);
+} else {
+    // Original drawing with offsets for other apples
     context.drawImage(appleImg, foodX + appleOffsetX, foodY + appleOffsetY, appleSize, 50);
+}
 
     // Apple collision
     if (snakeX === foodX && snakeY === foodY) {
         currentApple.effect();
         score += currentApple.points;
         
-        if (currentApple.name === "normal") {
-            snakeBody.unshift([snakeX, snakeY]);
-        } 
-        else if (currentApple.name === "sour" && snakeBody.length > 0) {
-            snakeBody.pop();
-        }
-        else if (currentApple.name === "lightning") {
+        // Only grow for these apple types
+        if (currentApple.name === "normal" || 
+            currentApple.name === "lightning" || 
+            currentApple.name === "frozen") {
             snakeBody.unshift([snakeX, snakeY]);
         }
-        
+
+        // no sour apple here cuz no grow..
+
         placeFood();
     }
 
@@ -265,45 +291,72 @@ function isValidTurn(newDir) {
 }
 
 function changeDirection(e) {
-
-    // First key press starts the game
+    // First key press starts the game if not moving
     if (velocityX === 0 && velocityY === 0) {
-        if (invertedControls) {
-            // Reverse controls if inverted
-            switch(e.code) {
-                case "ArrowUp": case "KeyW": e.code = "ArrowDown"; break;
-                case "ArrowDown": case "KeyS": e.code = "ArrowUp"; break;
-                case "ArrowLeft": case "KeyA": e.code = "ArrowRight"; break;
-                case "ArrowRight": case "KeyD": e.code = "ArrowLeft"; break;
-            }
-        }
+        let key = e.code;
         
-        // Immediate response to first key press
-        switch(e.code) {
-            case "ArrowUp": case "KeyW":
-                velocityX = 0; velocityY = -1; currentDirection = "up"; return;
-            case "ArrowDown": case "KeyS":
-                velocityX = 0; velocityY = 1; currentDirection = "down"; return;
-            case "ArrowLeft": case "KeyA":
-                velocityX = -1; velocityY = 0; currentDirection = "left"; return;
-            case "ArrowRight": case "KeyD":
-                velocityX = 1; velocityY = 0; currentDirection = "right"; return;
+        // Apply inversion if active
+        if (invertedControls) {
+            key = {
+                'ArrowUp': 'ArrowDown',
+                'ArrowDown': 'ArrowUp',
+                'ArrowLeft': 'ArrowRight',
+                'ArrowRight': 'ArrowLeft',
+                'KeyW': 'KeyS',
+                'KeyS': 'KeyW',
+                'KeyA': 'KeyD',
+                'KeyD': 'KeyA'
+            }[key] || key;
         }
+
+        // Start moving based on first key press
+        switch(key) {
+            case "ArrowUp": case "KeyW":
+                velocityX = 0; velocityY = -1; currentDirection = "up"; 
+                break;
+            case "ArrowDown": case "KeyS":
+                velocityX = 0; velocityY = 1; currentDirection = "down"; 
+                break;
+            case "ArrowLeft": case "KeyA":
+                velocityX = -1; velocityY = 0; currentDirection = "left"; 
+                break;
+            case "ArrowRight": case "KeyD":
+                velocityX = 1; velocityY = 0; currentDirection = "right"; 
+                break;
+        }
+        return;
     }
 
-    // Buffer the direction change for instant response
-    switch(e.code) {
+    // Buffer direction changes for smooth movement
+    let key = e.code;
+    
+    // Apply inversion if active
+    if (invertedControls) {
+        key = {
+            'ArrowUp': 'ArrowDown',
+            'ArrowDown': 'ArrowUp',
+            'ArrowLeft': 'ArrowRight',
+            'ArrowRight': 'ArrowLeft',
+            'KeyW': 'KeyS',
+            'KeyS': 'KeyW',
+            'KeyA': 'KeyD',
+            'KeyD': 'KeyA'
+        }[key] || key;
+    }
+
+    // Prevent 180-degree turns
+    switch(key) {
         case "ArrowUp": case "KeyW":
-            if (currentDirection !== "down") nextDirection = "up"; 
+            if (currentDirection !== "down") nextDirection = "up";
             break;
         case "ArrowDown": case "KeyS":
-            if (currentDirection !== "up") nextDirection = "down"; 
+            if (currentDirection !== "up") nextDirection = "down";
             break;
         case "ArrowLeft": case "KeyA":
-            if (currentDirection !== "right") nextDirection = "left"; 
+            if (currentDirection !== "right") nextDirection = "left";
             break;
         case "ArrowRight": case "KeyD":
-            if (currentDirection !== "left") nextDirection = "right"; 
+            if (currentDirection !== "left") nextDirection = "right";
             break;
     }
 }
@@ -385,6 +438,10 @@ function resetGame() {
     // Place new food
     placeFood();
     
+    // no inverted at reset
+    invertedControls = false;
+
+
     speedMultiplier = 1;
     speedBoostEndTime = 0;
 

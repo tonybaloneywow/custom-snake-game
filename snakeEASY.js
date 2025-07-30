@@ -5,18 +5,80 @@ const rows = 15;
 const cols = 28;
 let board, context;
 
-// Replay Button
-let replayButton;
+// Speeds
+let baseSpeed = 1000/8.5; // Current speed (8.5 FPS)
+let speedMultiplier = 1; // Normal speed
+let speedBoostEndTime = 0; // When speed boost ends
 
-// Game objects
-const appleImage = new Image();
-appleImage.src = './Apples/normal.png';
+// Game state variables
+let replayButton, score = 0;
+let invertedControls = false, gameInterval, gameOver = false;
+let snakeX = blockSize * 5, snakeY = blockSize * 5;
+let velocityX = 0, velocityY = 0;
+let snakeBody = [], foodX, foodY;
+let currentDirection = null, nextDirection = null;
+
+const appleTypes = [
+    {
+        name: "normal",
+        image: "./Apples/normal.png",
+        effect: () => {},
+        points: 1,
+        weight: 0.6
+    },
+    {
+        name: "sour",
+        image: "./Apples/sour.png",
+        effect: () => {}, // Does nothing
+        points: 0,
+        weight: 0.2
+    },
+    {
+        name: "lightning",
+        image: "./Apples/lightning.png",
+        effect: () => {
+            speedMultiplier = 1.5;
+            speedBoostEndTime = Date.now() + 5000;
+            clearInterval(gameInterval);
+            gameInterval = setInterval(update, baseSpeed / speedMultiplier);
+        },
+        points: 1,
+        weight: 0.15
+    },
+    {
+        name: "frozen",
+        image: "./Apples/frozen.png",
+        effect: () => {
+            speedMultiplier = 0.65; // 0.65x speed
+            speedBoostEndTime = Date.now() + 7000; // 10 seconds duration
+            clearInterval(gameInterval);
+            gameInterval = setInterval(update, baseSpeed / speedMultiplier);
+        },
+        points: 1,
+        weight: 0.25
+    },
+    {
+        name: "rotten",
+        image: "./Apples/rotten.png",
+        effect: () => {
+            invertedControls = true;
+            setTimeout(() => {
+                invertedControls = false;
+            }, 3000);
+        },
+        points: 1,
+        weight: 0
+    }
+    
+];
+
+let currentApple = appleTypes[0];
 
 // Snake Head
 const snakeHeadImg = new Image();
 snakeHeadImg.src = './Snake/Head.png';
 
-// Background Image (Canvas)
+// Background Images
 const mapImages = [
     './BGS/Lava.png',
     './BGS/Crossroads.png',
@@ -26,23 +88,6 @@ const mapImages = [
 ];
 let currentMap = '';
 const backgroundImage = new Image();
-
-let snakeX = blockSize * 5;
-let snakeY = blockSize * 5;
-
-let velocityX = 0;
-let velocityY = 0;
-
-let snakeBody = [];
-let foodX, foodY;
-let gameOver = false;
-
-// Movement control - now more responsive
-let currentDirection = null;
-let nextDirection = null;
-const turnDelay = 0; // No cooldown for instant turns
-
-
 
 // Initialize game
 window.onload = function() {
@@ -57,67 +102,65 @@ window.onload = function() {
     context.webkitImageSmoothingEnabled = false;
     context.msImageSmoothingEnabled = false;
     
-    placeFood();
     document.addEventListener("keydown", changeDirection);
-    setInterval(update, 1000/8.5); // Increased to 10 FPS for smoother movement
-
-    // Force hide cursor on canvas
     board.style.cursor = 'none';
-    
-    // Ensure game over popup can be clicked
     document.getElementById('gameOverPopup').style.pointerEvents = 'auto';
 
-    // Set up replay button
     replayButton = document.getElementById("replayButton");
     replayButton.addEventListener("click", resetGame);
 
     resetGame();
-
 };
 
 function update() {
     if (gameOver) return;
 
-    // Apply buffered direction immediately when grid-aligned
+    checkSpeedBoost();
+
+    // Apply buffered direction when grid-aligned
     if (nextDirection && snakeX % blockSize === 0 && snakeY % blockSize === 0) {
         applyDirectionChange();
     }
 
+    // Draw background
     context.drawImage(backgroundImage, 0, 0, board.width, board.height);
 
+    // Draw apple
+    const appleImg = new Image();
+appleImg.src = currentApple.image;
+const appleOffsetX = Math.round((blockSize - appleSize)/2);
+const appleOffsetY = Math.round((blockSize - 50)/2);
 
-    const appleWidth = 41.66;
-    const appleHeight = 50;
-    
-    context.drawImage(
-        appleImage,
-        foodX + (blockSize - appleWidth)/2,
-        foodY + (blockSize - appleHeight)/2,
-        appleWidth,
-        appleHeight
-    );
+// Special case for lightning apple
+if (currentApple.name === "lightning") {
+    // Draw at full block size
+    context.drawImage(appleImg, foodX, foodY, blockSize, blockSize);
+} else {
+    // Original drawing with offsets for other apples
+    context.drawImage(appleImg, foodX + appleOffsetX, foodY + appleOffsetY, appleSize, 50);
+}
 
-    if (!(snakeX === foodX && snakeY === foodY)) {
-        const appleOffset = (blockSize - appleSize) / 2;
-        context.drawImage(
-            appleImage,
-            foodX + appleOffset,
-            foodY + appleOffset,
-            appleSize,
-            appleSize
-        );
-    }
-
-    // Check food collision
+    // Apple collision
     if (snakeX === foodX && snakeY === foodY) {
-        snakeBody.push([foodX, foodY]);
-        placeFood(); // Get new apple position immediately
+        currentApple.effect();
+        score += currentApple.points;
+        
+        // Only grow for these apple types
+        if (currentApple.name === "normal" || 
+            currentApple.name === "lightning" || 
+            currentApple.name === "frozen") {
+            snakeBody.unshift([snakeX, snakeY]);
+        }
+
+        // no sour apple here cuz no grow..
+
+        placeFood();
     }
 
     // Update snake body
-    if (velocityX !== 0 || velocityY !== 0) { // Only move if started
+    if (velocityX !== 0 || velocityY !== 0) {
         for (let i = snakeBody.length - 1; i > 0; i--) {
-            snakeBody[i] = snakeBody[i - 1];
+            snakeBody[i] = snakeBody[i-1];
         }
         if (snakeBody.length) {
             snakeBody[0] = [snakeX, snakeY];
@@ -132,27 +175,109 @@ function update() {
     checkWallCollision();
     checkSelfCollision();
 
-    // Draw snake
+    // Draw snake body
     context.fillStyle = "#4C7AF2";
     for (let i = 0; i < snakeBody.length; i++) {
         context.fillRect(snakeBody[i][0], snakeBody[i][1], blockSize, blockSize);
     }
     
-    // Draw rotated head
+    // Draw snake head
     drawSnakeHead(snakeX, snakeY);
+} // This closing brace was missing
+
+    // Update snake body
+    if (velocityX !== 0 || velocityY !== 0) {
+        for (let i = snakeBody.length - 1; i > 0; i--) {
+            snakeBody[i] = snakeBody[i-1];
+        }
+        if (snakeBody.length) {
+            snakeBody[0] = [snakeX, snakeY];
+        }
+    }
+
+    // Move snake head
+    snakeX += velocityX * blockSize;
+    snakeY += velocityY * blockSize;
+
+    // Check collisions
+    checkWallCollision();
+    checkSelfCollision();
+
+    // Draw snake body
+    context.fillStyle = "#4C7AF2";
+    for (let i = 0; i < snakeBody.length; i++) {
+        context.fillRect(snakeBody[i][0], snakeBody[i][1], blockSize, blockSize);
+    }
+    
+    // Draw snake head
+    drawSnakeHead(snakeX, snakeY);
+
+
+function placeFood() {
+    // Select random apple type
+    const totalWeight = appleTypes.reduce((sum, apple) => sum + apple.weight, 0);
+    let random = Math.random() * totalWeight;
+    let cumulativeWeight = 0;
+    
+    for (const apple of appleTypes) {
+        cumulativeWeight += apple.weight;
+        if (random <= cumulativeWeight) {
+            currentApple = apple;
+            break;
+        }
+    }
+
+    // Find valid position
+    let validPosition = false;
+    let newFoodX, newFoodY;
+    let attempts = 0;
+    
+    while (!validPosition && attempts < 100) {
+        attempts++;
+        newFoodX = Math.floor(Math.random() * cols) * blockSize;
+        newFoodY = Math.floor(Math.random() * rows) * blockSize;
+        
+        let collision = false;
+        if (newFoodX === snakeX && newFoodY === snakeY) collision = true;
+        
+        for (let i = 0; i < snakeBody.length && !collision; i++) {
+            if (newFoodX === snakeBody[i][0] && newFoodY === snakeBody[i][1]) {
+                collision = true;
+            }
+        }
+        
+        if (!collision) validPosition = true;
+    }
+    
+    foodX = validPosition ? newFoodX : 0;
+    foodY = validPosition ? newFoodY : 0;
 }
 
 function applyDirectionChange() {
-    // Prevent 180° turns
     if (!isValidTurn(nextDirection)) return;
 
     switch (nextDirection) {
-        case "up": velocityX = 0; velocityY = -1; break;
-        case "down": velocityX = 0; velocityY = 1; break;
-        case "left": velocityX = -1; velocityY = 0; break;
-        case "right": velocityX = 1; velocityY = 0; break;
+        case "up": 
+            velocityX = 0; 
+            velocityY = -1;
+            currentDirection = "up";
+            break;
+        case "down":
+            velocityX = 0;
+            velocityY = 1;
+            currentDirection = "down";
+            break;
+        case "left":
+            velocityX = -1;
+            velocityY = 0;
+            currentDirection = "left";
+            break;
+        case "right":
+            velocityX = 1;
+            velocityY = 0;
+            currentDirection = "right";
+            break;
     }
-    currentDirection = nextDirection;
     nextDirection = null;
 }
 
@@ -166,35 +291,103 @@ function isValidTurn(newDir) {
 }
 
 function changeDirection(e) {
-    // First key press starts the game
+    // First key press starts the game if not moving
     if (velocityX === 0 && velocityY === 0) {
-        // Start moving in the pressed direction
-        switch(e.code) {
-            case "ArrowUp": case "KeyW":
-                velocityX = 0; velocityY = -1; currentDirection = "up"; return;
-            case "ArrowDown": case "KeyS":
-                velocityX = 0; velocityY = 1; currentDirection = "down"; return;
-            case "ArrowLeft": case "KeyA":
-                velocityX = -1; velocityY = 0; currentDirection = "left"; return;
-            case "ArrowRight": case "KeyD":
-                velocityX = 1; velocityY = 0; currentDirection = "right"; return;
+        let key = e.code;
+        
+        // Apply inversion if active
+        if (invertedControls) {
+            key = {
+                'ArrowUp': 'ArrowDown',
+                'ArrowDown': 'ArrowUp',
+                'ArrowLeft': 'ArrowRight',
+                'ArrowRight': 'ArrowLeft',
+                'KeyW': 'KeyS',
+                'KeyS': 'KeyW',
+                'KeyA': 'KeyD',
+                'KeyD': 'KeyA'
+            }[key] || key;
         }
+
+        // Start moving based on first key press
+        switch(key) {
+            case "ArrowUp": case "KeyW":
+                velocityX = 0; velocityY = -1; currentDirection = "up"; 
+                break;
+            case "ArrowDown": case "KeyS":
+                velocityX = 0; velocityY = 1; currentDirection = "down"; 
+                break;
+            case "ArrowLeft": case "KeyA":
+                velocityX = -1; velocityY = 0; currentDirection = "left"; 
+                break;
+            case "ArrowRight": case "KeyD":
+                velocityX = 1; velocityY = 0; currentDirection = "right"; 
+                break;
+        }
+        return;
     }
 
-    // Buffer the direction change
-    switch(e.code) {
+    // Buffer direction changes for smooth movement
+    let key = e.code;
+    
+    // Apply inversion if active
+    if (invertedControls) {
+        key = {
+            'ArrowUp': 'ArrowDown',
+            'ArrowDown': 'ArrowUp',
+            'ArrowLeft': 'ArrowRight',
+            'ArrowRight': 'ArrowLeft',
+            'KeyW': 'KeyS',
+            'KeyS': 'KeyW',
+            'KeyA': 'KeyD',
+            'KeyD': 'KeyA'
+        }[key] || key;
+    }
+
+    // Prevent 180-degree turns
+    switch(key) {
         case "ArrowUp": case "KeyW":
-            if (currentDirection !== "down") nextDirection = "up"; break;
+            if (currentDirection !== "down") nextDirection = "up";
+            break;
         case "ArrowDown": case "KeyS":
-            if (currentDirection !== "up") nextDirection = "down"; break;
+            if (currentDirection !== "up") nextDirection = "down";
+            break;
         case "ArrowLeft": case "KeyA":
-            if (currentDirection !== "right") nextDirection = "left"; break;
+            if (currentDirection !== "right") nextDirection = "left";
+            break;
         case "ArrowRight": case "KeyD":
-            if (currentDirection !== "left") nextDirection = "right"; break;
+            if (currentDirection !== "left") nextDirection = "right";
+            break;
     }
 }
 
-// ... (keep existing checkWallCollision, checkSelfCollision, endGame, placeFood functions)
+function applyDirectionChange() {
+    // Only change direction when aligned to grid
+    if (snakeX % blockSize === 0 && snakeY % blockSize === 0) {
+        if (!isValidTurn(nextDirection)) return;
+
+        switch(nextDirection) {
+            case "up": 
+                velocityX = 0; velocityY = -1; 
+                currentDirection = "up";
+                break;
+            case "down":
+                velocityX = 0; velocityY = 1;
+                currentDirection = "down";
+                break;
+            case "left":
+                velocityX = -1; velocityY = 0;
+                currentDirection = "left";
+                break;
+            case "right":
+                velocityX = 1; velocityY = 0;
+                currentDirection = "right";
+                break;
+        }
+        nextDirection = null;
+    }
+}
+
 function checkWallCollision() {
     if (snakeX < 0 || snakeX >= cols * blockSize || 
         snakeY < 0 || snakeY >= rows * blockSize) {
@@ -211,19 +404,13 @@ function checkSelfCollision() {
     }
 }
 
-function endGame() {
+function endGame(message) {
     gameOver = true;
-    
     document.body.style.cursor = 'default';
 
-    // Show your image popup
     const popup = document.getElementById("gameOverPopup");
     const gameOverImg = document.getElementById("gameOverImage");
-    
-    // Set your image source (use your existing image path)
-    gameOverImg.src = './Screens/GameOver.png'; // Update this to your exact image filename
-    
-    // Center the popup on screen
+    gameOverImg.src = './Screens/GameOver.png';
     popup.style.display = "block";
 }
 
@@ -239,6 +426,11 @@ function resetGame() {
     gameOver = false;
     currentDirection = null;
     nextDirection = null;
+    invertedControls = false;
+    score = 0;
+    
+    // Clear existing interval
+    if (gameInterval) clearInterval(gameInterval);
     
     // Load random map
     loadRandomMap();
@@ -246,90 +438,55 @@ function resetGame() {
     // Place new food
     placeFood();
     
+    // no inverted at reset
+    invertedControls = false;
+
+
+    speedMultiplier = 1;
+    speedBoostEndTime = 0;
+
     // Hide cursor again
     document.body.style.cursor = 'none';
     board.style.cursor = 'none';
     
-    // Redraw the initial state
-    // Note: We need to wait for the new background image to load
-    backgroundImage.onload = function() {
-        update();
-    };
+    // Start new game loop
+    gameInterval = setInterval(update, baseSpeed / speedMultiplier);
 }
 
-function placeFood() {
-    let validPosition = false;
-    let newFoodX, newFoodY;
-    
-    // Keep trying random positions until we find a valid one
-    while (!validPosition) {
-        newFoodX = Math.floor(Math.random() * cols) * blockSize;
-        newFoodY = Math.floor(Math.random() * rows) * blockSize;
-        
-        // Check if this position collides with snake head
-        const headCollision = (newFoodX === snakeX && newFoodY === snakeY);
-        
-        // Check if this position collides with any snake body segment
-        let bodyCollision = false;
-        for (let i = 0; i < snakeBody.length; i++) {
-            if (newFoodX === snakeBody[i][0] && newFoodY === snakeBody[i][1]) {
-                bodyCollision = true;
-                break;
-            }
-        }
-        
-        // If no collisions, we found a valid position
-        if (!headCollision && !bodyCollision) {
-            validPosition = true;
-        }
-    }
-    
-    foodX = newFoodX;
-    foodY = newFoodY;
-}
-
-// Function causes snake turn movement
 function drawSnakeHead(x, y) {
     if (!snakeHeadImg.complete) {
-        // Fallback if image not loaded
         context.fillRect(x, y, blockSize, blockSize);
         return;
     }
 
-    context.save(); // Save current canvas state
-    context.translate(x + blockSize/2, y + blockSize/2); // Move to center of head
+    context.save();
+    context.translate(x + blockSize/2, y + blockSize/2);
 
-    // Calculate rotation angle based on velocity
     let angle = 0;
-    if (velocityX === 1) angle = 0;         // Right
-    if (velocityX === -1) angle = Math.PI;   // Left
-    if (velocityY === -1) angle = -Math.PI/2; // Up
-    if (velocityY === 1) angle = Math.PI/2;   // Down
+    if (velocityX === 1) angle = 0;
+    if (velocityX === -1) angle = Math.PI;
+    if (velocityY === -1) angle = -Math.PI/2;
+    if (velocityY === 1) angle = Math.PI/2;
 
-    context.rotate(angle); // Apply rotation
+    context.rotate(angle);
     context.drawImage(
         snakeHeadImg,
-        -blockSize/2, -blockSize/2, // Draw from center
+        -blockSize/2, -blockSize/2,
         blockSize, blockSize
     );
-    context.restore(); // Restore canvas state
-} 
-
-// Add to your game variables
-const eatSound = document.getElementById('eatSound');
-eatSound.volume = 1.0; // Adjust volume (0.0 to 1.0)
-
-// Modify your apple collision code
-function checkAppleCollision() {
-    if (snakeX === foodX && snakeY === foodY) {
-        // Play eating sound
-        eatSound.currentTime = 0;
-    }
+    context.restore();
 }
 
 function loadRandomMap() {
-    // Randomly select a map
     const randomIndex = Math.floor(Math.random() * mapImages.length);
     currentMap = mapImages[randomIndex];
     backgroundImage.src = currentMap;
+}
+
+function checkSpeedBoost() {
+    if (speedMultiplier !== 1 && Date.now() > speedBoostEndTime) {
+        speedMultiplier = 1; // Reset to normal speed
+        clearInterval(gameInterval);
+        gameInterval = setInterval(update, baseSpeed / speedMultiplier);
+    }
 }
