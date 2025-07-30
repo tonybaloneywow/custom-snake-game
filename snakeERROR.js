@@ -5,17 +5,18 @@ const rows = 15;
 const cols = 28;
 let board, context;
 
+// Speeds
+let baseSpeed = 1000/10; // Current speed (12 FPS)
+let speedMultiplier = 1; // Normal speed
+let speedBoostEndTime = 0; // When speed boost ends
+
 // Game state variables
-let replayButton, justAteApple = false, score = 0;
+let replayButton, score = 0;
 let invertedControls = false, gameInterval, gameOver = false;
 let snakeX = blockSize * 5, snakeY = blockSize * 5;
 let velocityX = 0, velocityY = 0;
 let snakeBody = [], foodX, foodY;
 let currentDirection = null, nextDirection = null;
-
-// Game objects
-const appleImage = new Image();
-appleImage.src = './Apples/normal.png';
 
 const appleTypes = [
     {
@@ -23,22 +24,52 @@ const appleTypes = [
         image: "./Apples/normal.png",
         effect: () => {},
         points: 1,
-        weight: 0.7
+        weight: 0.2
+    },
+    {
+        name: "sour",
+        image: "./Apples/sour.png",
+        effect: () => {}, // Does nothing
+        points: 0,
+        weight: 0.1
+    },
+    {
+        name: "lightning",
+        image: "./Apples/lightning.png",
+        effect: () => {
+            speedMultiplier = 1.5;
+            speedBoostEndTime = Date.now() + 5000;
+            clearInterval(gameInterval);
+            gameInterval = setInterval(update, baseSpeed / speedMultiplier);
+        },
+        points: 1,
+        weight: 0.2
+    },
+    {
+        name: "frozen",
+        image: "./Apples/frozen.png",
+        effect: () => {
+            speedMultiplier = 0.65; // 0.65x speed
+            speedBoostEndTime = Date.now() + 7000; // 10 seconds duration
+            clearInterval(gameInterval);
+            gameInterval = setInterval(update, baseSpeed / speedMultiplier);
+        },
+        points: 1,
+        weight: 0.2
     },
     {
         name: "rotten",
         image: "./Apples/rotten.png",
         effect: () => {
-            velocityX *= -1;
-            velocityY *= -1;
             invertedControls = true;
             setTimeout(() => {
                 invertedControls = false;
-            }, 7000); // 7 seconds
+            }, 3000);
         },
         points: 1,
         weight: 0.3
     }
+    
 ];
 
 let currentApple = appleTypes[0];
@@ -49,11 +80,7 @@ snakeHeadImg.src = './Snake/Head.png';
 
 // Background Images
 const mapImages = [
-    './BGS/Lava.png',
-    './BGS/Crossroads.png',
-    './BGS/Space.png',
-    './BGS/Ice.png',
-    './BGS/Summer.png'
+    './BGS/Error.png'
 ];
 let currentMap = '';
 const backgroundImage = new Image();
@@ -84,6 +111,8 @@ window.onload = function() {
 function update() {
     if (gameOver) return;
 
+    checkSpeedBoost();
+
     // Apply buffered direction when grid-aligned
     if (nextDirection && snakeX % blockSize === 0 && snakeY % blockSize === 0) {
         applyDirectionChange();
@@ -94,18 +123,33 @@ function update() {
 
     // Draw apple
     const appleImg = new Image();
-    appleImg.src = currentApple.image;
-    const appleOffsetX = Math.round((blockSize - appleSize)/2);
-    const appleOffsetY = Math.round((blockSize - 50)/2);
-    context.drawImage(appleImg, foodX + appleOffsetX, foodY + appleOffsetY, appleSize, 50);
+appleImg.src = currentApple.image;
+const appleOffsetX = Math.round((blockSize - appleSize)/2);
+const appleOffsetY = Math.round((blockSize - 50)/2);
 
-    // Check apple collision
-    if (snakeX === foodX && snakeY === foodY && !justAteApple) {
-        justAteApple = true;
-        setTimeout(() => justAteApple = false, 100);
+// Special case for lightning apple
+if (currentApple.name === "lightning") {
+    // Draw at full block size
+    context.drawImage(appleImg, foodX, foodY, blockSize, blockSize);
+} else {
+    // Original drawing with offsets for other apples
+    context.drawImage(appleImg, foodX + appleOffsetX, foodY + appleOffsetY, appleSize, 50);
+}
+
+    // Apple collision
+    if (snakeX === foodX && snakeY === foodY) {
         currentApple.effect();
         score += currentApple.points;
-        snakeBody.unshift([snakeX, snakeY]);
+        
+        // Only grow for these apple types
+        if (currentApple.name === "normal" || 
+            currentApple.name === "lightning" || 
+            currentApple.name === "frozen") {
+            snakeBody.unshift([snakeX, snakeY]);
+        }
+
+        // no sour apple here cuz no grow..
+
         placeFood();
     }
 
@@ -135,7 +179,35 @@ function update() {
     
     // Draw snake head
     drawSnakeHead(snakeX, snakeY);
-}
+} // This closing brace was missing
+
+    // Update snake body
+    if (velocityX !== 0 || velocityY !== 0) {
+        for (let i = snakeBody.length - 1; i > 0; i--) {
+            snakeBody[i] = snakeBody[i-1];
+        }
+        if (snakeBody.length) {
+            snakeBody[0] = [snakeX, snakeY];
+        }
+    }
+
+    // Move snake head
+    snakeX += velocityX * blockSize;
+    snakeY += velocityY * blockSize;
+
+    // Check collisions
+    checkWallCollision();
+    checkSelfCollision();
+
+    // Draw snake body
+    context.fillStyle = "#4C7AF2";
+    for (let i = 0; i < snakeBody.length; i++) {
+        context.fillRect(snakeBody[i][0], snakeBody[i][1], blockSize, blockSize);
+    }
+    
+    // Draw snake head
+    drawSnakeHead(snakeX, snakeY);
+
 
 function placeFood() {
     // Select random apple type
@@ -215,46 +287,72 @@ function isValidTurn(newDir) {
 }
 
 function changeDirection(e) {
-    if (justAteApple) return;
-    
-    // First key press starts the game
+    // First key press starts the game if not moving
     if (velocityX === 0 && velocityY === 0) {
-        if (invertedControls) {
-            // Reverse controls if inverted
-            switch(e.code) {
-                case "ArrowUp": case "KeyW": e.code = "ArrowDown"; break;
-                case "ArrowDown": case "KeyS": e.code = "ArrowUp"; break;
-                case "ArrowLeft": case "KeyA": e.code = "ArrowRight"; break;
-                case "ArrowRight": case "KeyD": e.code = "ArrowLeft"; break;
-            }
-        }
+        let key = e.code;
         
-        // Immediate response to first key press
-        switch(e.code) {
-            case "ArrowUp": case "KeyW":
-                velocityX = 0; velocityY = -1; currentDirection = "up"; return;
-            case "ArrowDown": case "KeyS":
-                velocityX = 0; velocityY = 1; currentDirection = "down"; return;
-            case "ArrowLeft": case "KeyA":
-                velocityX = -1; velocityY = 0; currentDirection = "left"; return;
-            case "ArrowRight": case "KeyD":
-                velocityX = 1; velocityY = 0; currentDirection = "right"; return;
+        // Apply inversion if active
+        if (invertedControls) {
+            key = {
+                'ArrowUp': 'ArrowDown',
+                'ArrowDown': 'ArrowUp',
+                'ArrowLeft': 'ArrowRight',
+                'ArrowRight': 'ArrowLeft',
+                'KeyW': 'KeyS',
+                'KeyS': 'KeyW',
+                'KeyA': 'KeyD',
+                'KeyD': 'KeyA'
+            }[key] || key;
         }
+
+        // Start moving based on first key press
+        switch(key) {
+            case "ArrowUp": case "KeyW":
+                velocityX = 0; velocityY = -1; currentDirection = "up"; 
+                break;
+            case "ArrowDown": case "KeyS":
+                velocityX = 0; velocityY = 1; currentDirection = "down"; 
+                break;
+            case "ArrowLeft": case "KeyA":
+                velocityX = -1; velocityY = 0; currentDirection = "left"; 
+                break;
+            case "ArrowRight": case "KeyD":
+                velocityX = 1; velocityY = 0; currentDirection = "right"; 
+                break;
+        }
+        return;
     }
 
-    // Buffer the direction change for instant response
-    switch(e.code) {
+    // Buffer direction changes for smooth movement
+    let key = e.code;
+    
+    // Apply inversion if active
+    if (invertedControls) {
+        key = {
+            'ArrowUp': 'ArrowDown',
+            'ArrowDown': 'ArrowUp',
+            'ArrowLeft': 'ArrowRight',
+            'ArrowRight': 'ArrowLeft',
+            'KeyW': 'KeyS',
+            'KeyS': 'KeyW',
+            'KeyA': 'KeyD',
+            'KeyD': 'KeyA'
+        }[key] || key;
+    }
+
+    // Prevent 180-degree turns
+    switch(key) {
         case "ArrowUp": case "KeyW":
-            if (currentDirection !== "down") nextDirection = "up"; 
+            if (currentDirection !== "down") nextDirection = "up";
             break;
         case "ArrowDown": case "KeyS":
-            if (currentDirection !== "up") nextDirection = "down"; 
+            if (currentDirection !== "up") nextDirection = "down";
             break;
         case "ArrowLeft": case "KeyA":
-            if (currentDirection !== "right") nextDirection = "left"; 
+            if (currentDirection !== "right") nextDirection = "left";
             break;
         case "ArrowRight": case "KeyD":
-            if (currentDirection !== "left") nextDirection = "right"; 
+            if (currentDirection !== "left") nextDirection = "right";
             break;
     }
 }
@@ -336,12 +434,19 @@ function resetGame() {
     // Place new food
     placeFood();
     
+    // no inverted at reset
+    invertedControls = false;
+
+
+    speedMultiplier = 1;
+    speedBoostEndTime = 0;
+
     // Hide cursor again
     document.body.style.cursor = 'none';
     board.style.cursor = 'none';
     
     // Start new game loop
-    gameInterval = setInterval(update, 1000/12);
+    gameInterval = setInterval(update, baseSpeed / speedMultiplier);
 }
 
 function drawSnakeHead(x, y) {
@@ -372,4 +477,12 @@ function loadRandomMap() {
     const randomIndex = Math.floor(Math.random() * mapImages.length);
     currentMap = mapImages[randomIndex];
     backgroundImage.src = currentMap;
+}
+
+function checkSpeedBoost() {
+    if (speedMultiplier !== 1 && Date.now() > speedBoostEndTime) {
+        speedMultiplier = 1; // Reset to normal speed
+        clearInterval(gameInterval);
+        gameInterval = setInterval(update, baseSpeed / speedMultiplier);
+    }
 }

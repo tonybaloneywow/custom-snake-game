@@ -84,7 +84,9 @@ const mapImages = [
     './BGS/Crossroads.png',
     './BGS/Space.png',
     './BGS/Ice.png',
-    './BGS/Summer.png'
+    './BGS/Summer.png',
+    './BGS/Mineshaft.png',
+    './BGS/Moon.png'
 ];
 let currentMap = '';
 const backgroundImage = new Image();

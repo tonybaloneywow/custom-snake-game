@@ -55,7 +55,7 @@ const appleTypes = [
             gameInterval = setInterval(update, baseSpeed / speedMultiplier);
         },
         points: 1,
-        weight: 0.2
+        weight: 0.25
     },
     {
         name: "rotten",
@@ -67,7 +67,7 @@ const appleTypes = [
             }, 3000);
         },
         points: 1,
-        weight: 0.5
+        weight: 0.05
     }
     
 ];
@@ -84,7 +84,9 @@ const mapImages = [
     './BGS/Crossroads.png',
     './BGS/Space.png',
     './BGS/Ice.png',
-    './BGS/Summer.png'
+    './BGS/Summer.png',
+    './BGS/Mineshaft.png',
+    './BGS/Moon.png'
 ];
 let currentMap = '';
 const backgroundImage = new Image();

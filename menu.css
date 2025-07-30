@@ -217,3 +217,23 @@ body {
 .hard-button:active {
   transform: scale(0.9);
 }
+
+.Error-button {
+  position: absolute;
+  cursor: pointer;
+  width: 61.16px;
+  height: 39.37px;
+  transition: transform 0.2s;
+  top: 65.75%;
+  left: 59.5%;
+  cursor: url('/Cursors/glove.png') 0 0, pointer;
+  z-index: 225;
+}
+
+.Error-button:hover {
+  transform: scale(1.1);
+}
+
+.Error-button:active {
+  transform: scale(0.9);
+}

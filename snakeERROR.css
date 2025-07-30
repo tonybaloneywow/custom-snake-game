@@ -1,0 +1,80 @@
+body {
+  background-color: black;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  
+  /* Cursor removal - body level */
+  cursor: none;
+  
+  /* Keep these selection blockers */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -khtml-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+img, a{  
+  -webkit-user-select: none; /* Safari 3.1+ */ 
+  -moz-user-select: none; /* Firefox 2+ */ 
+  -ms-user-select: none; /* IE 10+ */ 
+  user-select: none; /* Standard syntax */ 
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+}
+
+#gameOverPopup {
+  position: absolute;
+}
+
+#replayButton {
+  width: 452px;
+  height: 92px;
+  
+  position: absolute;
+  
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 101;
+  
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+#replayButton:hover {
+  transform: translateX(-50%) scale(1.05);
+  filter: brightness(1.1);
+}
+
+#replayButton:active {
+  transform: translateX(-50%) scale(0.98);
+}
+
+#menuButton {
+  width: 452px;
+  height: 92px;
+  top: 70%;
+  left: 23.35%;
+  position: absolute;
+  
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 101;
+  
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+#replayButton:hover {
+  transform: translateX(-50%) scale(1.05);
+  filter: brightness(1.1);
+}
+
+#replayButton:active {
+  transform: translateX(-50%) scale(0.98);
+}
