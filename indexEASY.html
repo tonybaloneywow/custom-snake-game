@@ -4,23 +4,28 @@
         <meta charset="UTF-8">
         <meta name="viewport", content="width=device-width, initial-scale=1.0">
         <title>Custom Snake Game</title>
-        <link rel="stylesheet" href="snake.css">
+        <link rel="stylesheet" href="snakeEASY.css">
         <script src="snakeEASY.js"></script>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Tiny5&display=swap" rel="stylesheet">
     </head>
 
     <body>
     <canvas id="board" oncontextmenu="return false"></canvas>
+    <div id="scoreboard"><p>Score: <span id="score">1</span></p></div>
+    <div id="highscore"><img id="bronzeTrophy" src="/Pop-Ups/Bronze.png"><span id="highscoreValue">1</span></div>
     <div id="gameOverPopup" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; text-align: center;">
         <a draggable="false">
             <img id="gameOverImage" src="game-over.png" 
                 style="position: absolute; 
-                 top: 50%; 
+                 top: 41%; 
                         left: 50%; 
                         transform: translate(-50%, -50%) scale(0.98); /* 20% stretch in ALL directions */
                         width: auto;
                         height: auto;
-                        max-width: 90%;  /* Increased to accommodate stretch */
-                        max-height: 90%;
+                        max-width: 100%;  /* Increased to accommodate stretch */
+                        max-height: 100%;
                         object-fit: contain;"
                         oncontextmenu="return false">
         </a>

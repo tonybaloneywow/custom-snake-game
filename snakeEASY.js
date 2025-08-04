@@ -5,8 +5,12 @@ const rows = 15;
 const cols = 28;
 let board, context;
 
+
+// Local Storage
+let highScore = localStorage.getItem('snakeHighScoreEasy') || 1;
+
 // Speeds
-let baseSpeed = 1000/8.5; // Current speed (8.5 FPS)
+let baseSpeed = 1000/8.5; // Current speed (12 FPS)
 let speedMultiplier = 1; // Normal speed
 let speedBoostEndTime = 0; // When speed boost ends
 
@@ -31,7 +35,7 @@ const appleTypes = [
         image: "./Apples/sour.png",
         effect: () => {}, // Does nothing
         points: 0,
-        weight: 0.2
+        weight: 0.1
     },
     {
         name: "lightning",
@@ -56,20 +60,7 @@ const appleTypes = [
         },
         points: 1,
         weight: 0.25
-    },
-    {
-        name: "rotten",
-        image: "./Apples/rotten.png",
-        effect: () => {
-            invertedControls = true;
-            setTimeout(() => {
-                invertedControls = false;
-            }, 3000);
-        },
-        points: 1,
-        weight: 0
     }
-    
 ];
 
 let currentApple = appleTypes[0];
@@ -93,6 +84,11 @@ const backgroundImage = new Image();
 
 // Initialize game
 window.onload = function() {
+
+    // Highscore
+    document.getElementById("highscoreValue").textContent = highScore;
+
+
     board = document.getElementById("board");
     board.height = rows * blockSize;
     board.width = cols * blockSize;
@@ -150,6 +146,7 @@ if (currentApple.name === "lightning") {
         // Only grow for these apple types
         if (currentApple.name === "normal" || 
             currentApple.name === "lightning" || 
+            currentApple.name === "rotten" ||
             currentApple.name === "frozen") {
             snakeBody.unshift([snakeX, snakeY]);
         }
@@ -157,6 +154,19 @@ if (currentApple.name === "lightning") {
         // no sour apple here cuz no grow..
 
         placeFood();
+        
+        // Update score
+        const scoreElement = document.getElementById("score");
+        let currentScore = parseInt(scoreElement.textContent);
+        currentScore++;
+        scoreElement.textContent = currentScore;
+    
+        // Check and update high score
+        if (currentScore > highScore) {
+            highScore = currentScore;
+            document.getElementById("highscoreValue").textContent = highScore;
+            localStorage.setItem('snakeHighScoreEasy', highScore);
+        }
     }
 
     // Update snake body
@@ -418,6 +428,12 @@ function endGame(message) {
 
 function resetGame() {
     document.getElementById("gameOverPopup").style.display = "none";
+
+
+    // highscore values and normal score
+    document.getElementById("highscoreValue").textContent = highScore;
+    document.getElementById("gameOverPopup").style.display = "none";
+    document.getElementById("score").textContent = "1"; // Reset score to 1
     
     // Reset game state
     snakeX = blockSize * 5;
@@ -454,6 +470,8 @@ function resetGame() {
     // Start new game loop
     gameInterval = setInterval(update, baseSpeed / speedMultiplier);
 }
+
+
 
 function drawSnakeHead(x, y) {
     if (!snakeHeadImg.complete) {
