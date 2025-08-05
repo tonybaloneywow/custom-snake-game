@@ -27,7 +27,7 @@ const appleTypes = [
         image: "./Apples/normal.png",
         effect: () => {},
         points: 1,
-        weight: 0.5
+        weight: 0.4
     },
     {
         name: "sour",
@@ -46,7 +46,7 @@ const appleTypes = [
             gameInterval = setInterval(update, baseSpeed / speedMultiplier);
         },
         points: 1,
-        weight: 0.2
+        weight: 0.25
     },
     {
         name: "frozen",
@@ -58,7 +58,7 @@ const appleTypes = [
             gameInterval = setInterval(update, baseSpeed / speedMultiplier);
         },
         points: 1,
-        weight: 0.2
+        weight: 0.15
     },
     {
         name: "rotten",
@@ -70,7 +70,7 @@ const appleTypes = [
             }, 3000);
         },
         points: 1,
-        weight: 0
+        weight: 0.1
     }
     
 ];
@@ -534,7 +534,7 @@ function checkSpeedBoost() {
 // Start background music
 function startBackgroundMusic() {
     const bgMusic = document.getElementById('bgMusic');
-    bgMusic.volume = 0.3; // 30% volume
+    bgMusic.volume = 0.5; // 30% volume
     bgMusic.play().catch(e => {
         // If autoplay fails, wait for user interaction
         document.addEventListener('click', function musicStarter() {

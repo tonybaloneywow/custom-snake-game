@@ -27,7 +27,7 @@ const appleTypes = [
         image: "./Apples/normal.png",
         effect: () => {},
         points: 1,
-        weight: 0.5
+        weight: 0.35
     },
     {
         name: "sour",
@@ -58,7 +58,7 @@ const appleTypes = [
             gameInterval = setInterval(update, baseSpeed / speedMultiplier);
         },
         points: 1,
-        weight: 0.2
+        weight: 0.15
     },
     {
         name: "rotten",
@@ -70,7 +70,7 @@ const appleTypes = [
             }, 3000);
         },
         points: 1,
-        weight: 0
+        weight: 0.2
     }
     
 ];
@@ -83,13 +83,7 @@ snakeHeadImg.src = './Snake/Head.png';
 
 // Background Images
 const mapImages = [
-    './BGS/Lava.png',
-    './BGS/Crossroads.png',
-    './BGS/Space.png',
-    './BGS/Ice.png',
-    './BGS/Summer.png',
-    './BGS/Mineshaft.png',
-    './BGS/Moon.png'
+    './BGS/Error.png'
 ];
 let currentMap = '';
 const backgroundImage = new Image();
@@ -534,7 +528,7 @@ function checkSpeedBoost() {
 // Start background music
 function startBackgroundMusic() {
     const bgMusic = document.getElementById('bgMusic');
-    bgMusic.volume = 0.3; // 30% volume
+    bgMusic.volume = 0.5; // 30% volume
     bgMusic.play().catch(e => {
         // If autoplay fails, wait for user interaction
         document.addEventListener('click', function musicStarter() {

@@ -534,7 +534,7 @@ function checkSpeedBoost() {
 // Start background music
 function startBackgroundMusic() {
     const bgMusic = document.getElementById('bgMusic');
-    bgMusic.volume = 0.3; // 30% volume
+    bgMusic.volume = 0.5; // 30% volume
     bgMusic.play().catch(e => {
         // If autoplay fails, wait for user interaction
         document.addEventListener('click', function musicStarter() {
@@ -543,3 +543,5 @@ function startBackgroundMusic() {
         }, { once: true });
     });
 }
+
+let playDifficultySound = () => new Audio("Sounds/DifficultyClick.mp3").play()
