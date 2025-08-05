@@ -5,12 +5,11 @@ const rows = 15;
 const cols = 28;
 let board, context;
 
-
 // Local Storage
 let highScore = localStorage.getItem('snakeHighScoreEasy') || 1;
 
 // Speeds
-let baseSpeed = 1000/8.5; // Current speed (12 FPS)
+let baseSpeed = 1000/8.5; // Current speed (8.5 FPS)
 let speedMultiplier = 1; // Normal speed
 let speedBoostEndTime = 0; // When speed boost ends
 
@@ -28,7 +27,7 @@ const appleTypes = [
         image: "./Apples/normal.png",
         effect: () => {},
         points: 1,
-        weight: 0.6
+        weight: 0.5
     },
     {
         name: "sour",
@@ -47,7 +46,7 @@ const appleTypes = [
             gameInterval = setInterval(update, baseSpeed / speedMultiplier);
         },
         points: 1,
-        weight: 0.15
+        weight: 0.2
     },
     {
         name: "frozen",
@@ -59,8 +58,21 @@ const appleTypes = [
             gameInterval = setInterval(update, baseSpeed / speedMultiplier);
         },
         points: 1,
-        weight: 0.25
+        weight: 0.2
+    },
+    {
+        name: "rotten",
+        image: "./Apples/rotten.png",
+        effect: () => {
+            invertedControls = true;
+            setTimeout(() => {
+                invertedControls = false;
+            }, 3000);
+        },
+        points: 1,
+        weight: 0
     }
+    
 ];
 
 let currentApple = appleTypes[0];
@@ -85,6 +97,10 @@ const backgroundImage = new Image();
 // Initialize game
 window.onload = function() {
 
+    // BG Music
+    startBackgroundMusic();
+
+    
     // Highscore
     document.getElementById("highscoreValue").textContent = highScore;
 
@@ -139,35 +155,39 @@ if (currentApple.name === "lightning") {
 }
 
     // Apple collision
-    if (snakeX === foodX && snakeY === foodY) {
-        currentApple.effect();
-        score += currentApple.points;
-        
-        // Only grow for these apple types
-        if (currentApple.name === "normal" || 
-            currentApple.name === "lightning" || 
-            currentApple.name === "rotten" ||
-            currentApple.name === "frozen") {
-            snakeBody.unshift([snakeX, snakeY]);
-        }
-
-        // no sour apple here cuz no grow..
-
-        placeFood();
-        
-        // Update score
-        const scoreElement = document.getElementById("score");
-        let currentScore = parseInt(scoreElement.textContent);
-        currentScore++;
-        scoreElement.textContent = currentScore;
+    // Apple collision
+if (snakeX === foodX && snakeY === foodY) {
+    // Play eating sound
+    const eatSound = document.getElementById('eatSound');
+    eatSound.currentTime = 0; // Rewind to start if already playing
+    eatSound.play().catch(e => console.log("Eat sound error:", e));
     
-        // Check and update high score
-        if (currentScore > highScore) {
-            highScore = currentScore;
-            document.getElementById("highscoreValue").textContent = highScore;
-            localStorage.setItem('snakeHighScoreEasy', highScore);
-        }
+    currentApple.effect();
+    score += currentApple.points;
+    
+    // Only grow for these apple types
+    if (currentApple.name === "normal" || 
+        currentApple.name === "lightning" || 
+        currentApple.name === "rotten" ||
+        currentApple.name === "frozen") {
+        snakeBody.unshift([snakeX, snakeY]);
     }
+
+    placeFood();
+    
+    // Update score display
+    const scoreElement = document.getElementById("score");
+    let currentScore = parseInt(scoreElement.textContent);
+    currentScore++;
+    scoreElement.textContent = currentScore;
+
+    // Check and update high score
+    if (currentScore > highScore) {
+        highScore = currentScore;
+        document.getElementById("highscoreValue").textContent = highScore;
+        localStorage.setItem('snakeHighScoreEasy', highScore);
+    }
+}
 
     // Update snake body
     if (velocityX !== 0 || velocityY !== 0) {
@@ -509,4 +529,17 @@ function checkSpeedBoost() {
         clearInterval(gameInterval);
         gameInterval = setInterval(update, baseSpeed / speedMultiplier);
     }
+}
+
+// Start background music
+function startBackgroundMusic() {
+    const bgMusic = document.getElementById('bgMusic');
+    bgMusic.volume = 0.3; // 30% volume
+    bgMusic.play().catch(e => {
+        // If autoplay fails, wait for user interaction
+        document.addEventListener('click', function musicStarter() {
+            bgMusic.play();
+            document.removeEventListener('click', musicStarter);
+        }, { once: true });
+    });
 }

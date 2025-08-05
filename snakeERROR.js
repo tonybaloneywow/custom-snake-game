@@ -5,12 +5,11 @@ const rows = 15;
 const cols = 28;
 let board, context;
 
-
 // Local Storage
 let highScore = localStorage.getItem('snakeHighScoreError') || 1;
 
 // Speeds
-let baseSpeed = 1000/10; // Current speed (12 FPS)
+let baseSpeed = 1000/10; // Current speed (10 FPS)
 let speedMultiplier = 1; // Normal speed
 let speedBoostEndTime = 0; // When speed boost ends
 
@@ -84,7 +83,13 @@ snakeHeadImg.src = './Snake/Head.png';
 
 // Background Images
 const mapImages = [
-    './BGS/ERROR.png'
+    './BGS/Lava.png',
+    './BGS/Crossroads.png',
+    './BGS/Space.png',
+    './BGS/Ice.png',
+    './BGS/Summer.png',
+    './BGS/Mineshaft.png',
+    './BGS/Moon.png'
 ];
 let currentMap = '';
 const backgroundImage = new Image();
@@ -92,6 +97,10 @@ const backgroundImage = new Image();
 // Initialize game
 window.onload = function() {
 
+    // BG Music
+    startBackgroundMusic();
+
+    
     // Highscore
     document.getElementById("highscoreValue").textContent = highScore;
 
@@ -146,35 +155,39 @@ if (currentApple.name === "lightning") {
 }
 
     // Apple collision
-    if (snakeX === foodX && snakeY === foodY) {
-        currentApple.effect();
-        score += currentApple.points;
-        
-        // Only grow for these apple types
-        if (currentApple.name === "normal" || 
-            currentApple.name === "lightning" || 
-            currentApple.name === "rotten" ||
-            currentApple.name === "frozen") {
-            snakeBody.unshift([snakeX, snakeY]);
-        }
-
-        // no sour apple here cuz no grow..
-
-        placeFood();
-        
-        // Update score
-        const scoreElement = document.getElementById("score");
-        let currentScore = parseInt(scoreElement.textContent);
-        currentScore++;
-        scoreElement.textContent = currentScore;
+    // Apple collision
+if (snakeX === foodX && snakeY === foodY) {
+    // Play eating sound
+    const eatSound = document.getElementById('eatSound');
+    eatSound.currentTime = 0; // Rewind to start if already playing
+    eatSound.play().catch(e => console.log("Eat sound error:", e));
     
-        // Check and update high score
-        if (currentScore > highScore) {
-            highScore = currentScore;
-            document.getElementById("highscoreValue").textContent = highScore;
-            localStorage.setItem('snakeHighScoreError', highScore);
-        }
+    currentApple.effect();
+    score += currentApple.points;
+    
+    // Only grow for these apple types
+    if (currentApple.name === "normal" || 
+        currentApple.name === "lightning" || 
+        currentApple.name === "rotten" ||
+        currentApple.name === "frozen") {
+        snakeBody.unshift([snakeX, snakeY]);
     }
+
+    placeFood();
+    
+    // Update score display
+    const scoreElement = document.getElementById("score");
+    let currentScore = parseInt(scoreElement.textContent);
+    currentScore++;
+    scoreElement.textContent = currentScore;
+
+    // Check and update high score
+    if (currentScore > highScore) {
+        highScore = currentScore;
+        document.getElementById("highscoreValue").textContent = highScore;
+        localStorage.setItem('snakeHighScoreError', highScore);
+    }
+}
 
     // Update snake body
     if (velocityX !== 0 || velocityY !== 0) {
@@ -516,4 +529,17 @@ function checkSpeedBoost() {
         clearInterval(gameInterval);
         gameInterval = setInterval(update, baseSpeed / speedMultiplier);
     }
+}
+
+// Start background music
+function startBackgroundMusic() {
+    const bgMusic = document.getElementById('bgMusic');
+    bgMusic.volume = 0.3; // 30% volume
+    bgMusic.play().catch(e => {
+        // If autoplay fails, wait for user interaction
+        document.addEventListener('click', function musicStarter() {
+            bgMusic.play();
+            document.removeEventListener('click', musicStarter);
+        }, { once: true });
+    });
 }
