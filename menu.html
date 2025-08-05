@@ -6,25 +6,27 @@
         <title>Custom Snake Menu</title>
         <link rel="stylesheet" href="menu.css">
         <script src="menu.js"></script>
+        <audio id="buttonSound" src="Sounds/ButtonClick.mp3" preload="auto"></audio>
+        <audio id="difficultySound" src="Sounds/DifficultyClick.mp3" preload="auto"></audio>
     </head>
     <body>
         <img id="menuBackground" src="/Screens/Background.png" style="width:1400px;height:750px;" draggable="false" oncontextmenu="return false">
         <img id="menuTitleSnake" src="/Title/SnakeTitle.png" draggable="false" oncontextmenu="return false">
-        <img id="menuPlayButton" src="/Title/PlayButton.png" draggable="false" oncontextmenu="return false">
+        <img id="menuPlayButton" src="/Title/PlayButton.png" draggable="false" oncontextmenu="return false" onclick="playButtonSound()">
         <div id="gamePopup" class="popup-container">
-          <img id="exitButton" src="/Pop-Ups/CancelButton.png" class="exit-button" oncontextmenu="return false">
+          <img id="exitButton" src="/Pop-Ups/CancelButton.png" class="exit-button" oncontextmenu="return false" onclick="playButtonSound()">
           <img id="popupImage" src="/Pop-Ups/Difficulty.png" class="popup-image" oncontextmenu="return false">
           <a href="/index.html">
           <img id="normalButton" src="/Pop-Ups/Normal.png" class="normal-button" oncontextmenu="return false">
           </a>
           <a href="/indexEASY.html">
-            <img id="easyButton" src="/Pop-Ups/Easy.png" class="easy-button" oncontextmenu="return false">
+            <img id="easyButton" src="/Pop-Ups/Easy.png" class="easy-button" oncontextmenu="return false" onclick="playDifficultySound()">
           </a>
           <a href="/indexHARD.html">
-            <img id="hardButton" src="/Pop-Ups/Hard.png" class="hard-button" oncontextmenu="return false">
+            <img id="hardButton" src="/Pop-Ups/Hard.png" class="hard-button" oncontextmenu="return false" onclick="playDifficultySound()">
           </a>
           <a href="/indexERROR.html">
-            <img id="ErrorButton" src="/Pop-Ups/Error.png" class="Error-button" oncontextmenu="return false">
+            <img id="ErrorButton" src="/Pop-Ups/Error.png" class="Error-button" oncontextmenu="return false" onclick="playDifficultySound()">
           </a>
         </div>  
     </body>

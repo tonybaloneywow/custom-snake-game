@@ -17,3 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
         popup.style.display = 'none';
     });
 });
+
+let playButtonSound = () => new Audio("Sounds/ButtonClick.mp3").play()
+
+let playDifficultySound = () => new Audio("Sounds/DifficultyClick.mp3").play()
