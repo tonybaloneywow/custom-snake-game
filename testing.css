@@ -1,0 +1,48 @@
+/* Hide the actual checkbox (it was visible because opacity wasn't properly set) */
+.bauble_box input.bauble_input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* The track - now with image backgrounds */
+.bauble_box .bauble_label {
+    display: block;
+    width: 112px;
+    height: 56px;
+    background-image: url('/Pop-Ups/greenslider.png'); /* Your green ON state image */
+    background-size: cover;
+    cursor: pointer;
+    position: relative;
+    transition: background-image 0.3s ease;
+}
+
+/* Your custom toggle circle (image) */
+.bauble_box .toggle-handle {
+    position: absolute;
+    width: 48px; /* Match your image size */
+    height: 48px;
+    left: 4px;
+    top: 4px;
+    transition: all 0.1s ease;
+    z-index: 2;
+}
+
+/* When toggled OFF - switches to red background */
+.bauble_box input.bauble_input:checked + .bauble_label {
+    background-image: url('/Pop-Ups/redslider.png'); /* Your red OFF state image */
+}
+
+.bauble_box input.bauble_input:checked + .bauble_label .toggle-handle {
+    left: calc(100% - 52px); /* Slides handle to right */
+}
+
+img, a {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+  }

@@ -237,3 +237,29 @@ body {
 .Error-button:active {
   transform: scale(0.9);
 }
+
+#settingsButton {
+  z-index: 225;
+  height: 80px;
+  top: 74.5%;
+  left: 14.45%;
+  position: absolute;
+  cursor: pointer;
+  transition: transform 0.2s;
+  cursor: url('/Cursors/glove.png') 0 0, pointer;
+}
+
+#settingsButton:hover {
+  transform: scale(1.2);
+}
+
+#settingsButton:active {
+  transform: scale(0.8);
+}
+
+#settingsPopup {
+  height: 428.96px;
+  width: 519px;
+  position: fixed;
+  top: 50%;
+}
