@@ -239,7 +239,7 @@ body {
 }
 
 #settingsButton {
-  z-index: 225;
+  z-index: 199;
   height: 80px;
   top: 74.5%;
   left: 14.45%;
@@ -258,8 +258,98 @@ body {
 }
 
 #settingsPopup {
-  height: 428.96px;
-  width: 519px;
+  height: 100%;
+  width: 100%;
   position: fixed;
-  top: 50%;
+  z-index: 250;
+  left: 0.5%;
+}
+
+#exitSettingsButton {
+  position: absolute;
+    cursor: pointer;
+    width: 44.29px;
+    height: 44.29px;
+    transition: transform 0.2s;
+    top: 29.4%;
+    left: 59.7%;
+    cursor: url('/Cursors/glove.png') 0 0, pointer;
+    z-index: 5000; /* Make sure it's above the popup image */
+}
+
+#exitSettingsButton:hover {
+    transform: scale(1.1);
+}
+#exitSettingsButton:active {
+    transform: scale(0.9);
+}
+
+/* Slider Container - Make sure it's visible */
+.bauble_box {
+  position: absolute; /* Changed from default */
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Track styling - ensure images load */
+.bauble_label {
+  display: block;
+  width: 112px;
+  height: 56px;
+  background-image: url('/Pop-Ups/greenslider.png');
+  background-size: 100% 100%; /* Changed from cover */
+  background-repeat: no-repeat;
+  cursor: url('/Cursors/glove.png') 0 0, pointer;
+  position: relative;
+  z-index: 100;
+}
+
+/* Handle styling */
+.toggle-handle {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  left: 4px;
+  top: 4px;
+  transition: all 0.3s ease;
+  z-index: 200;
+}
+
+/* Checked state */
+.bauble_input:checked + .bauble_label {
+  background-image: url('/Pop-Ups/redslider.png');
+}
+
+.bauble_input:checked + .bauble_label .toggle-handle {
+  left: calc(100% - 52px);
+}
+
+/* Hide the actual checkbox */
+.bauble_input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Add this to your menu.css */
+#settingsPopup .bauble_box {
+  position: absolute;
+  top: 45%; /* Adjust this to position vertically */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300; /* Higher than popup elements */
+}
+
+/* Ensure popup content is properly layered */
+#settingsPopup {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#settingsPopupImage {
+  position: relative;
+  z-index: 250;
 }

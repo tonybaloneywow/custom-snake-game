@@ -8,7 +8,7 @@
         <script src="menu.js"></script>
         <audio id="buttonSound" src="Sounds/ButtonClick.mp3" preload="auto"></audio>
         <audio id="difficultySound" src="Sounds/DifficultyClick.mp3" preload="auto"></audio>
-    </head>
+      </head>
     <body>
         <img id="menuBackground" src="/Screens/Background.png" style="width:1400px;height:750px;" draggable="false" oncontextmenu="return false">
         <img id="menuTitleSnake" src="/Title/SnakeTitle.png" draggable="false" oncontextmenu="return false">
@@ -30,10 +30,22 @@
           </a>
         </div>
         <img id="settingsButton" src="/Pop-Ups/SettingsButton.png" draggable="false" oncontextmenu="return" onclick="playButtonSound()">
-        <div id="settingsPopup" class="popup-container" style="display: none;">
-          <img id="exitSettingsButton" src="/Pop-Ups/CancelButton.png" class="exit-button" draggable="false" oncontextmenu="return" onclick="playButtonSound()">
+        <div id="settingsPopup" style="display: none;">
+          <img id="exitSettingsButton" src="/Pop-Ups/CancelButton.png" draggable="false" oncontextmenu="return" onclick="playButtonSound()">
           <img id="settingsPopupImage" src="/Pop-Ups/SettingsMenu.png" class="popup-image">
-        
-          </div>
+              <div class="bauble_box" style="top: 40.65%; left: 59%">
+              <input type="checkbox" id="musicToggle" class="bauble_input" oncontextmenu="return false">
+              <label for="musicToggle" class="bauble_label" oncontextmenu="return false">
+                <img src="/togglebtn.png" class="toggle-handle" oncontextmenu="return false">
+              </label>
+              <span class="toggle-label"></span>
+            </div>
+              <div class="bauble_box" style="top: 51.75%; left: 59%;">
+              <input type="checkbox" id="sfxToggle" class="bauble_input" oncontextmenu="return false">
+              <label for="sfxToggle" class="bauble_label" oncontextmenu="return false">
+                <img src="/togglebtn.png" class="toggle-handle" oncontextmenu="return false">
+              </label>
+              <span class="toggle-label"></span>
+            </div>
         </div>
 </html>
