@@ -9,7 +9,7 @@ let board, context;
 let highScore = localStorage.getItem('snakeHighScoreHard') || 1;
 
 // Speeds
-let baseSpeed = 1000/15; // Current speed (15 FPS)
+let baseSpeed = 1000/14; // Current speed (15 FPS)
 let speedMultiplier = 1; // Normal speed
 let speedBoostEndTime = 0; // When speed boost ends
 
@@ -67,7 +67,7 @@ const appleTypes = [
             invertedControls = true;
             setTimeout(() => {
                 invertedControls = false;
-            }, 3000);
+            }, 2500);
         },
         points: 1,
         weight: 0.1
