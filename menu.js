@@ -42,3 +42,4 @@ let playDifficultySound = () => new Audio("Sounds/DifficultyClick.mp3").play();
 // Prevent right-click
 document.addEventListener('contextmenu', event => event.preventDefault());
 
+// TETASIHRENJFJOIksj
