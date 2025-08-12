@@ -15,7 +15,39 @@
             <source src="Sounds/BackgroundMusic.mp3" type="audio/mpeg">
         </audio>
     </head>
+    <script>
+    // Game page sound initialization
+    document.addEventListener('DOMContentLoaded', function() {
+        // Set up background music according to saved preference
+        const bgMusic = document.getElementById('bgMusic');
+        if (bgMusic) {
+            bgMusic.volume = 0.5;
+            bgMusic.muted = localStorage.getItem('musicEnabled') === 'false';
+            if (!bgMusic.muted) {
+                bgMusic.play().catch(() => {
+                    // Handle autoplay restrictions
+                    document.addEventListener('click', function startMusic() {
+                        if (localStorage.getItem('musicEnabled') !== 'false') {
+                            bgMusic.play();
+                        }
+                        document.removeEventListener('click', startMusic);
+                    }, { once: true });
+                });
+            }
+        }
+    });
 
+    // Universal sound function for game pages
+    function playGameSound(soundId) {
+        if (localStorage.getItem('sfxEnabled') !== 'false') {
+            const sound = document.getElementById(soundId);
+            if (sound) {
+                sound.currentTime = 0;
+                sound.play().catch(e => console.log("Sound error:", e));
+            }
+        }
+    }
+    </script>
     <body>
     <canvas id="board" oncontextmenu="return false"></canvas>
     <div id="scoreboard"><p>Score: <span id="score">1</span></p></div>
