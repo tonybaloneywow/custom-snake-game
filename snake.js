@@ -27,14 +27,24 @@ const appleTypes = [
         image: "./Apples/normal.png",
         effect: () => {},
         points: 1,
-        weight: 0.5
+        weight: 0.5,
+        color: "#4C7AF2"  // normal blue
     },
     {
         name: "sour",
         image: "./Apples/sour.png",
         effect: () => {}, // Does nothing
         points: 0,
-        weight: 0.1
+        weight: 0.1,
+        color: "#82D860"  // sour green
+    },
+    {
+        name: "cupid",
+        image: "./Apples/cupid.png",
+        effect: () => {},
+        points: 3,
+        weight: 0.1,
+        color: "#FF7CA8"  // cupid pink
     },
     {
         name: "lightning",
@@ -46,7 +56,8 @@ const appleTypes = [
             gameInterval = setInterval(update, baseSpeed / speedMultiplier);
         },
         points: 1,
-        weight: 0.2
+        weight: 0.2,
+        color: "#A5F6EA"  // lightning cyan
     },
     {
         name: "frozen",
@@ -58,7 +69,8 @@ const appleTypes = [
             gameInterval = setInterval(update, baseSpeed / speedMultiplier);
         },
         points: 1,
-        weight: 0.2
+        weight: 0.2,
+        color: "#A0E7FF"  // frozen light blue
     },
     {
         name: "rotten",
@@ -70,9 +82,9 @@ const appleTypes = [
             }, 3000);
         },
         points: 1,
-        weight: 0
+        weight: 0,
+        color: "#9455CA"  // rotten purple
     }
-    
 ];
 
 let currentApple = appleTypes[0];
@@ -154,8 +166,7 @@ if (currentApple.name === "lightning") {
     context.drawImage(appleImg, foodX + appleOffsetX, foodY + appleOffsetY, appleSize, 50);
 }
 
-    // Apple collision
-    // Apple collision
+// Apple collision
 if (snakeX === foodX && snakeY === foodY) {
     // Play eating sound
     const eatSound = document.getElementById('eatSound');
@@ -164,6 +175,9 @@ if (snakeX === foodX && snakeY === foodY) {
     
     currentApple.effect();
     score += currentApple.points;
+    
+    // Change snake color based on apple type
+    currentSnakeColor = currentApple.color;
     
     // Only grow for these apple types
     if (currentApple.name === "normal" || 
@@ -208,9 +222,9 @@ if (snakeX === foodX && snakeY === foodY) {
     checkSelfCollision();
 
     // Draw snake body
-    context.fillStyle = "#4C7AF2";
+    context.fillStyle = currentSnakeColor;
     for (let i = 0; i < snakeBody.length; i++) {
-        context.fillRect(snakeBody[i][0], snakeBody[i][1], blockSize, blockSize);
+    context.fillRect(snakeBody[i][0], snakeBody[i][1], blockSize, blockSize);
     }
     
     // Draw snake head
@@ -449,7 +463,9 @@ function endGame(message) {
 function resetGame() {
     document.getElementById("gameOverPopup").style.display = "none";
 
-
+    // Reset snake color to default
+    currentSnakeColor = "#4C7AF2";
+    
     // highscore values and normal score
     document.getElementById("highscoreValue").textContent = highScore;
     document.getElementById("gameOverPopup").style.display = "none";
