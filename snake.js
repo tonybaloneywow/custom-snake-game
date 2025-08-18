@@ -7,7 +7,7 @@ let board, context;
 
 
 // Local Storage
-let highScore = localStorage.getItem('snakeHighScore') || 1;
+let highScore = localStorage.getItem('snakeHighScoreEasy') || 1;
 
 
 //Snake colors
@@ -272,7 +272,7 @@ if (snakeX === foodX && snakeY === foodY) {
     if (score > highScore) {
         highScore = score;
         document.getElementById("highscoreValue").textContent = highScore;
-        localStorage.setItem('snakeHighScore', highScore);
+        localStorage.setItem('snakeHighScoreEasy', highScore);
     }
 }
 
