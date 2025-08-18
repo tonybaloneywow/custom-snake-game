@@ -284,21 +284,25 @@ body {
     transform: scale(0.9);
 }
 
-/* Slider Container - Make sure it's visible */
+/* Slider Container */
 .bauble_box {
-  position: absolute; /* Changed from default */
+  position: absolute;
   display: flex;
   align-items: center;
   gap: 15px;
+  top: 45%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 300;
 }
 
-/* Track styling - ensure images load */
+/* Track styling - Green by default */
 .bauble_label {
   display: block;
   width: 112px;
   height: 56px;
-  background-image: url('/Pop-Ups/greenslider.png');
-  background-size: 100% 100%; /* Changed from cover */
+  background-image: url('/Pop-Ups/redslider.png');
+  background-size: 100% 100%;
   background-repeat: no-repeat;
   cursor: url('/Cursors/glove.png') 0 0, pointer;
   position: relative;
@@ -310,19 +314,21 @@ body {
   position: absolute;
   width: 48px;
   height: 48px;
-  left: 4px;
+  left: 4px; /* Position on the left (green side) by default */
   top: 4px;
   transition: all 0.3s ease;
   z-index: 200;
+  background-image: url('/Pop-Ups/sliderknob.png'); /* Add your knob image */
+  background-size: contain;
 }
 
-/* Checked state */
+/* Red state (when checked) */
 .bauble_input:checked + .bauble_label {
-  background-image: url('/Pop-Ups/redslider.png');
+  background-image: url('/Pop-Ups/greenslider.png');
 }
 
 .bauble_input:checked + .bauble_label .toggle-handle {
-  left: calc(100% - 52px);
+  left: calc(100% - 52px); /* Move to the right (red side) when checked */
 }
 
 /* Hide the actual checkbox */
