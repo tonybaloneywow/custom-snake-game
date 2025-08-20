@@ -297,7 +297,7 @@ body {
   display: block;
   width: 112px;
   height: 56px;
-  background-image: url('/Pop-Ups/greenslider.png');
+  background-image: url('/Pop-Ups/redslider.png');
   background-size: 100% 100%; /* Changed from cover */
   background-repeat: no-repeat;
   cursor: url('/Cursors/glove.png') 0 0, pointer;
@@ -318,7 +318,7 @@ body {
 
 /* Checked state */
 .bauble_input:checked + .bauble_label {
-  background-image: url('/Pop-Ups/redslider.png');
+  background-image: url('/Pop-Ups/greenslider.png');
 }
 
 .bauble_input:checked + .bauble_label .toggle-handle {
